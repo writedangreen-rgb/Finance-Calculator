@@ -2,232 +2,326 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Semcasting | Incremental Media Performance Calculator (Demo)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Incremental Media Performance Calculator</title>
   <style>
     :root{
-      --bg:#0b0f17;
-      --card:#121a2a;
-      --card2:#0f1626;
-      --border:#22304d;
-      --border2:#2a3a5e;
-      --text:#e8eefc;
-      --muted:rgba(232,238,252,.78);
-      --muted2:rgba(232,238,252,.65);
-      --accent:#4b78ff;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --bg:#ffffff;
+      --panel:#f9fafb;
+      --primary:#111827;
+      --primaryText:#ffffff;
+      --radius:14px;
+      --shadow:0 10px 25px rgba(0,0,0,.06);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    body{ margin:0; background:var(--bg); color:var(--text); }
-    .wrap{ max-width: 1120px; margin: 0 auto; padding: 24px 18px 48px; }
-
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; padding: 10px 12px; border: 1px solid var(--border);
-      background: rgba(18,26,42,.75); border-radius: 14px;
-      backdrop-filter: blur(6px);
+    body{ margin:0; font-family:var(--font); color:var(--text); background:#f3f4f6; }
+    .wrap{ max-width:980px; margin:32px auto; padding:0 16px; }
+    .card{ background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+    .header{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:18px 20px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,#fff,#fbfbfb);
     }
-    .brand{ display:flex; align-items:center; gap:10px; }
-    .logo{
-      width:34px; height:34px; border-radius:10px;
-      background: linear-gradient(135deg, var(--accent), #7aa2ff);
-      box-shadow: 0 10px 24px rgba(75,120,255,.25);
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700; letter-spacing:.2px;
     }
-    .brand h1{ font-size: 15px; margin:0; letter-spacing:.2px; }
-    .brand .sub{ font-size: 12px; color: var(--muted2); margin: 2px 0 0; }
-
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-    button{
-      border:1px solid var(--border2); background:#0b1220; color:var(--text);
-      border-radius: 10px; padding: 10px 12px; cursor:pointer; font-size: 13px;
+    .dot{ width:10px; height:10px; border-radius:999px; background:#2563eb; } /* light brand accent */
+    .sub{ color:var(--muted); font-size:13px; font-weight:500; }
+    .content{ padding:20px; }
+    .title{
+      font-weight:800;
+      font-size:22px; /* 2 sizes larger than input text */
+      line-height:1.25;
+      margin:0 0 16px 0;
     }
-    button:hover{ border-color: var(--accent); }
-    .primary{
-      border-color: rgba(75,120,255,.65);
-      background: rgba(75,120,255,.14);
-    }
-    .primary:hover{ border-color: var(--accent); background: rgba(75,120,255,.18); }
 
-    .headline{ margin: 14px 2px 18px; }
-    .headline h2{ margin:0 0 6px; font-size: 20px; }
-    .headline p{ margin:0; color: var(--muted); line-height: 1.35; }
+    .grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    @media (max-width:820px){ .grid{ grid-template-columns:1fr; } }
 
-    .grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
-    @media (min-width: 980px){ .grid{ grid-template-columns: 1.05fr .95fr; } }
+    .field{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px; }
+    .label{ display:flex; justify-content:space-between; gap:10px; font-size:13px; font-weight:700; margin-bottom:8px; }
+    .hint{ color:var(--muted); font-weight:600; font-size:12px; }
 
-    .card{ background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
-    .card h3{ margin:0 0 10px; font-size: 14px; color: var(--muted); letter-spacing:.25px; }
-    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
-    @media (min-width: 560px){ .row{ grid-template-columns: 1fr 1fr; } }
-    .field{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 10px; }
-    label{ display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-
-    /* Input wrapper to show $ and % signs */
-    .input-wrap{ position: relative; }
-    .input-wrap .prefix, .input-wrap .suffix{
+    .inputWrap{ position:relative; }
+    .prefix, .suffix{
       position:absolute; top:50%; transform:translateY(-50%);
-      opacity:.70; pointer-events:none; font-size: 13px;
+      color:var(--muted); font-weight:800; font-size:14px;
+      pointer-events:none;
     }
-    .input-wrap .prefix{ left:10px; }
-    .input-wrap .suffix{ right:10px; }
-
+    .prefix{ left:12px; }
+    .suffix{ right:12px; } /* keeps % tight to the number on the right */
     input{
-      width:100%; box-sizing:border-box;
-      padding: 10px 10px; border-radius: 10px;
-      border: 1px solid var(--border2);
-      background: #0b1220; color: var(--text);
-      font-size: 14px; outline: none;
+      width:100%;
+      font-size:15px;
+      padding:12px 12px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      outline:none;
+      background:#fff;
+      box-sizing:border-box;
     }
-    input:focus{ border-color: var(--accent); }
+    input.money{ padding-left:28px; }
+    input.percent{ padding-right:28px; text-align:right; }
+    input:focus{ border-color:#c7d2fe; box-shadow:0 0 0 4px rgba(99,102,241,.12); }
 
-    /* ensure room for $ and % */
-    .pad-left{ padding-left: 26px !important; }
-    .pad-right{ padding-right: 26px !important; }
+    .actions{ margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{
+      border:0; border-radius:12px; padding:14px 18px;
+      font-weight:800; font-size:16px; cursor:pointer;
+    }
+    .btn.primary{ background:var(--primary); color:var(--primaryText); min-width:240px; }
+    .btn.secondary{ background:#e5e7eb; color:#111827; }
+    .btn:active{ transform:translateY(1px); }
 
-    .hint{ font-size: 11px; color: var(--muted2); margin-top: 6px; line-height:1.25; }
-    .divider{ height:1px; background: rgba(34,48,77,.9); margin: 12px 0; }
+    /* Outputs under inputs */
+    .outputs{
+      margin-top:18px;
+      border-top:1px solid var(--border);
+      padding-top:18px;
+    }
+    .outputs h2{ margin:0 0 10px 0; font-size:16px; }
+    .outGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    @media (max-width:900px){ .outGrid{ grid-template-columns:1fr; } }
+    .kpi{
+      border:1px solid var(--border); border-radius:12px; padding:12px;
+      background:#fff;
+    }
+    .kpi .k{ color:var(--muted); font-weight:800; font-size:12px; }
+    .kpi .v{ margin-top:6px; font-size:18px; font-weight:900; }
 
-    .kpi{ display:grid; grid-template-columns: 1fr; gap: 10px; }
-    .kpi .item{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
-    .kpi .name{ font-size: 12px; color: var(--muted); }
-    .kpi .val{ font-size: 20px; margin-top: 4px; }
-    .kpi .mini{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height:1.25; }
-
-    .err{ color:#ffb4b4; font-size: 12px; margin-top: 10px; display:none; }
-    .foot{ margin-top: 14px; font-size: 11px; color: var(--muted2); line-height: 1.35; }
-    .pill{
-      display:inline-block; font-size: 11px; color: var(--muted);
-      border:1px solid var(--border); padding: 4px 8px; border-radius: 999px;
-      background: rgba(15,22,38,.6);
+    /* Print/PDF styling */
+    @media print{
+      body{ background:#fff; }
+      .wrap{ margin:0; max-width:none; padding:0; }
+      .card{ box-shadow:none; border:0; border-radius:0; }
+      .actions{ display:none !important; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+    <div class="card" id="reportRoot">
+      <div class="header">
         <div>
-          <h1>Semcasting</h1>
-          <div class="sub">Incremental Media Performance Calculator (Demo)</div>
+          <div class="brand"><span class="dot"></span>Semcasting</div>
+          <div class="sub">Incremental Media Performance Calculator</div>
         </div>
+        <div class="sub">Demo / Testing</div>
       </div>
-      <div class="actions">
-        <button id="copyBtn" type="button">Copy shareable link</button>
-        <button id="pdfBtn" class="primary" type="button">Download PDF report</button>
-        <button id="resetBtn" type="button">Reset to defaults</button>
+
+      <div class="content">
+        <p class="title">
+          Please enter some basic business metrics to determine the impact of measurement for your financial organization.
+        </p>
+
+        <div class="grid">
+          <!-- Budget ($) -->
+          <div class="field">
+            <div class="label">
+              <span>Estimated Display and CTV Digital Marketing Budget</span>
+              <span class="hint">benchmark</span>
+            </div>
+            <div class="inputWrap">
+              <span class="prefix">$</span>
+              <input id="budget" class="money" inputmode="decimal" value="0" />
+            </div>
+          </div>
+
+          <!-- CPM ($) -->
+          <div class="field">
+            <div class="label">
+              <span>Estimated Blended CPM</span>
+              <span class="hint">benchmark</span>
+            </div>
+            <div class="inputWrap">
+              <span class="prefix">$</span>
+              <input id="cpm" class="money" inputmode="decimal" value="15" />
+            </div>
+          </div>
+
+          <!-- App Start Rate (%) -->
+          <div class="field">
+            <div class="label">
+              <span>Estimated Application Start Rate</span>
+              <span class="hint">benchmark</span>
+            </div>
+            <div class="inputWrap">
+              <input id="startRate" class="percent" inputmode="decimal" maxlength="5" value="0.40" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <!-- App Completion Rate (%) -->
+          <div class="field">
+            <div class="label">
+              <span>Estimated Application Completion Rate</span>
+              <span class="hint">benchmark</span>
+            </div>
+            <div class="inputWrap">
+              <input id="completionRate" class="percent" inputmode="decimal" maxlength="5" value="40" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <!-- Funded Rate (%) -->
+          <div class="field">
+            <div class="label">
+              <span>Estimated Application Funded Rate</span>
+              <span class="hint">benchmark</span>
+            </div>
+            <div class="inputWrap">
+              <input id="fundedRate" class="percent" inputmode="decimal" maxlength="5" value="50" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Big submit button under inputs -->
+        <div class="actions">
+          <button class="btn primary" id="calcBtn">Calculate</button>
+          <button class="btn secondary" id="pdfBtn">Download PDF</button>
+        </div>
+
+        <!-- Outputs below inputs -->
+        <div class="outputs">
+          <h2>Outputs</h2>
+          <div class="outGrid">
+            <div class="kpi">
+              <div class="k">All Impressions Delivered</div>
+              <div class="v" id="outImpressions">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Total Application Starts</div>
+              <div class="v" id="outStarts">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Total Application Funded</div>
+              <div class="v" id="outFunded">—</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <div class="headline">
-      <h2>Mortgage Lenders — “Same Budget / Better Performance”</h2>
-      <p>
-        Impressions are computed as <span class="pill">(Budget ÷ CPM) × 1000</span>.
-      </p>
-    </div>
+  <script>
+    // ---------- Formatting helpers ----------
+    const nf0 = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+    const nf2 = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    <div class="grid">
-      <!-- INPUTS -->
-      <div class="card">
-        <h3>Inputs</h3>
+    function stripNonNumeric(s){
+      return String(s ?? '').replace(/[^0-9.\-]/g,'');
+    }
+    function parseCurrency(s){
+      const n = parseFloat(stripNonNumeric(s));
+      return Number.isFinite(n) ? n : 0;
+    }
+    function parsePercent(s){
+      // User types "0.40" meaning 0.40% (not 40%)
+      const n = parseFloat(stripNonNumeric(s));
+      return Number.isFinite(n) ? n : 0;
+    }
+    function formatCurrency(n){
+      return nf2.format(Number(n || 0));
+    }
+    function formatInteger(n){
+      return nf0.format(Number(n || 0));
+    }
+    function clamp(n, min, max){
+      return Math.min(Math.max(n, min), max);
+    }
 
-        <div class="row">
-          <div class="field">
-            <label for="budget">Estimated Display and CTV Digital Marketing Budget</label>
-            <div class="input-wrap">
-              <span class="prefix">$</span>
-              <input id="budget" class="pad-left" inputmode="decimal" value="10,000,000.00" required>
-            </div>
-            <div class="hint">Default: $10,000,000</div>
-          </div>
+    function attachMoneyFormatting(id){
+      const el = document.getElementById(id);
+      el.addEventListener('focus', () => {
+        // show raw number without commas while editing
+        el.value = String(parseCurrency(el.value));
+      });
+      el.addEventListener('blur', () => {
+        const v = parseCurrency(el.value);
+        el.value = formatCurrency(v);
+      });
+      // initialize formatted
+      el.value = formatCurrency(parseCurrency(el.value));
+    }
 
-          <div class="field">
-            <label for="cpm">Estimated Blended CPM</label>
-            <div class="input-wrap">
-              <span class="prefix">$</span>
-              <input id="cpm" class="pad-left" inputmode="decimal" value="15.00" required>
-            </div>
-            <div class="hint">Minimum $2.00</div>
-          </div>
-        </div>
+    function attachPercentRules(id){
+      const el = document.getElementById(id);
 
-        <div class="row">
-          <div class="field">
-            <label for="ctr">Estimated Click-Through/View Through Rate</label>
-            <div class="input-wrap">
-              <input id="ctr" class="pad-right" inputmode="decimal" value="0.15" required>
-              <span class="suffix">%</span>
-            </div>
-            <div class="hint">Default: 0.15%</div>
-          </div>
+      el.addEventListener('input', () => {
+        // allow only digits + one dot; max 2 decimals
+        let v = stripNonNumeric(el.value);
+        const parts = v.split('.');
+        if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+        if (v.includes('.')) {
+          const [a,b] = v.split('.');
+          v = a + '.' + (b ?? '').slice(0,2);
+        }
+        // hard clamp 0-100
+        const num = clamp(parseFloat(v || '0'), 0, 100);
+        // preserve typing feel: don’t over-format mid-entry
+        el.value = String(Number.isFinite(num) ? (v.endsWith('.') ? v : v) : 0).slice(0, el.maxLength || 10);
+      });
 
-          <div class="field">
-            <label for="startRate">Estimated Application Start Rate</label>
-            <div class="input-wrap">
-              <input id="startRate" class="pad-right" inputmode="decimal" value="0.40" required>
-              <span class="suffix">%</span>
-            </div>
-            <div class="hint">Default: 0.40%</div>
-          </div>
-        </div>
+      el.addEventListener('blur', () => {
+        const num = clamp(parsePercent(el.value), 0, 100);
+        // keep tidy: show up to 2 decimals, but don’t force trailing zeros unless you want
+        el.value = (Math.round(num * 100) / 100).toString();
+      });
+    }
 
-        <div class="row">
-          <div class="field">
-            <label for="completionRate">Estimated Application Completion Rate</label>
-            <div class="input-wrap">
-              <input id="completionRate" class="pad-right" inputmode="decimal" value="40" required>
-              <span class="suffix">%</span>
-            </div>
-            <div class="hint">Default: 40%</div>
-          </div>
+    // ---------- Wire up inputs ----------
+    attachMoneyFormatting('budget');
+    attachMoneyFormatting('cpm');
+    attachPercentRules('startRate');
+    attachPercentRules('completionRate');
+    attachPercentRules('fundedRate');
 
-          <div class="field">
-            <label for="fundedRate">Estimated Application Funded Rate</label>
-            <div class="input-wrap">
-              <input id="fundedRate" class="pad-right" inputmode="decimal" value="50" required>
-              <span class="suffix">%</span>
-            </div>
-            <div class="hint">Default: 50%</div>
-          </div>
-        </div>
+    // ---------- Calculation ----------
+    function calculate(){
+      const budget = parseCurrency(document.getElementById('budget').value);
+      const cpm = Math.max(parseCurrency(document.getElementById('cpm').value), 2);
 
-        <div class="row">
-          <div class="field">
-            <label for="ltv">Lifetime Value Per Funded Loan</label>
-            <div class="input-wrap">
-              <span class="prefix">$</span>
-              <input id="ltv" class="pad-left" inputmode="decimal" value="10,000.00" required>
-            </div>
-            <div class="hint">Default: $10,000</div>
-          </div>
+      const startPct = parsePercent(document.getElementById('startRate').value);       // e.g. 0.40
+      const completionPct = parsePercent(document.getElementById('completionRate').value); // e.g. 40
+      const fundedPct = parsePercent(document.getElementById('fundedRate').value);     // e.g. 50
 
-          <div class="field">
-            <label for="rounding">Volume rounding (decimals)</label>
-            <input id="rounding" type="number" min="0" max="6" step="1" value="0">
-            <div class="hint">0 = whole numbers</div>
-          </div>
-        </div>
+      // Impressions = (Budget / CPM) * 1000
+      const impressions = (budget / cpm) * 1000;
 
-        <div class="divider"></div>
+      // NOTE: Your workbook uses CTR/VTR too; if your current calculator already has it, keep it.
+      // Here, we can only compute starts/funded using the rates you provided.
+      // If you want starts/funded to reflect CTR/VTR, add that input back and multiply it in.
 
-        <h3>Implementation of Media Measurement and Identity Tools</h3>
+      // Interpreting: startPct is percent (0.40%) => decimal = 0.004
+      const startRate = startPct / 100.0;
+      const completionRate = completionPct / 100.0;
+      const fundedRate = fundedPct / 100.0;
 
-        <div class="row">
-          <div class="field">
-            <label for="suppr">Supression against current customers</label>
-            <div class="input-wrap">
-              <input id="suppr" class="pad-right" inputmode="decimal" value="10" required>
-              <span class="suffix">%</span>
-            </div>
-          </div>
+      const totalStarts = impressions * startRate;
+      const totalFunded = totalStarts * completionRate * fundedRate;
 
-          <div class="field">
-            <label for="freqCtl">Control Actual Impression Frequency (over/under exposed across media)</label>
-            <div class="input-wrap">
-              <input id="freqCtl" class="pad-right" inputmode="decimal" value="10" required>
-              <span class="suffix">%</span>
-            </div>
-          </div>
-        </div>
+      document.getElementById('outImpressions').textContent = formatInteger(impressions);
+      document.getElementById('outStarts').textContent = formatInteger(totalStarts);
+      document.getElementById('outFunded').textContent = formatInteger(totalFunded);
+    }
 
-        <div class="row
+    document.getElementById('calcBtn').addEventListener('click', calculate);
 
+    // ---------- PDF ----------
+    // Most reliable for static hosting: open print dialog; user "Save as PDF"
+    document.getElementById('pdfBtn').addEventListener('click', () => {
+      // ensure outputs are current before printing
+      calculate();
+      window.print();
+    });
+
+    // initial calc so page isn't blank
+    calculate();
+  </script>
+</body>
+</html>
