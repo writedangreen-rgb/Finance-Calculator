@@ -21,4 +21,732 @@
     .wrap{ max-width: 980px; margin: 0 auto; padding: 24px 18px 56px; }
 
     .topbar{
-      display:flex; align-items:center; just
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding: 10px 12px; border: 1px solid var(--border);
+      background: rgba(18,26,42,.75); border-radius: 14px;
+      backdrop-filter: blur(6px);
+    }
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: linear-gradient(135deg, var(--accent), #7aa2ff);
+      box-shadow: 0 10px 24px rgba(75,120,255,.25);
+    }
+    .brand h1{ font-size: 15px; margin:0; letter-spacing:.2px; }
+    .brand .sub{ font-size: 12px; color: var(--muted2); margin: 2px 0 0; }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    button{
+      border:1px solid var(--border2); background:#0b1220; color:var(--text);
+      border-radius: 12px; padding: 10px 12px; cursor:pointer; font-size: 13px;
+    }
+    button:hover{ border-color: var(--accent); }
+    .primary{
+      border-color: rgba(75,120,255,.65);
+      background: rgba(75,120,255,.14);
+    }
+    .primary:hover{ border-color: var(--accent); background: rgba(75,120,255,.18); }
+
+    /* Main content cards */
+    .card{ background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 14px; }
+    .titlePrompt{
+      font-weight: 800;
+      font-size: 22px; /* two sizes larger than input text */
+      line-height: 1.2;
+      margin: 0 0 14px 0;
+    }
+
+    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
+    @media (min-width: 720px){ .row{ grid-template-columns: 1fr 1fr; } }
+
+    .field{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 10px; }
+    label{ display:block; font-size: 14px; color: var(--muted); margin-bottom: 6px; font-weight: 650; }
+
+    .hint{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height:1.25; font-weight: 600; }
+    .divider{ height:1px; background: rgba(34,48,77,.9); margin: 12px 0; }
+
+    /* Input wrapper to show $ and % signs */
+    .input-wrap{
+      position: relative;
+    }
+    .input-wrap .prefix, .input-wrap .suffix{
+      position:absolute; top:50%; transform:translateY(-50%);
+      opacity:.70; pointer-events:none; font-size: 14px; font-weight: 800;
+    }
+    .input-wrap .prefix{ left:10px; }
+    .input-wrap .suffix{ right:10px; } /* tight to the number on the right */
+
+    input{
+      width:100%; box-sizing:border-box;
+      padding: 10px 10px; border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: #0b1220; color: var(--text);
+      font-size: 14px; outline: none;
+    }
+    input:focus{ border-color: var(--accent); }
+
+    /* ensure room for $ and % */
+    .pad-left{ padding-left: 28px !important; }
+    .pad-right{ padding-right: 26px !important; }
+
+    /* ---- FIX: Percent fields visually 5 digits wide ----
+       Stop input-wrap from stretching when it contains percent inputs,
+       and override input{width:100%} for those percent inputs.
+    */
+    .input-wrap.percent-wrap{
+      display: inline-block;   /* critical: prevents full-row stretch */
+    }
+    .input-wrap.percent-wrap input.percent{
+      width: 5ch !important;       /* 5 characters */
+      min-width: 5ch !important;
+      max-width: 5ch !important;
+      text-align: right;
+      box-sizing: content-box;     /* more predictable ch sizing */
+    }
+    .input-wrap.percent-wrap .suffix{
+      right: 8px; /* slightly tighter */
+    }
+
+    /* Money fields: keep flexible */
+    input.money{ width: 100%; }
+
+    /* Big submit button */
+    .ctaRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 6px; }
+    .ctaBig{
+      font-size: 16px;
+      font-weight: 900;
+      padding: 14px 18px;
+      border-radius: 14px;
+      min-width: 260px;
+    }
+
+    /* Outputs */
+    .outputsTitle{ font-size: 16px; font-weight: 850; margin: 0 0 10px; color: var(--muted); }
+    .kpiGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 720px){ .kpiGrid{ grid-template-columns: 1fr 1fr; } }
+
+    .kpi{
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .kpi .k{ font-size: 12px; color: var(--muted); font-weight: 800; }
+    .kpi .v{ font-size: 20px; margin-top: 6px; font-weight: 900; }
+    .kpi .m{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height: 1.25; }
+
+    .err{ color:#ffb4b4; font-size: 12px; margin-top: 10px; display:none; font-weight: 700; }
+    .foot{ margin-top: 14px; font-size: 11px; color: var(--muted2); line-height: 1.35; }
+
+    @media print{
+      body{ background:#fff; color:#111; }
+      .topbar, .ctaRow, .noPrint{ display:none !important; }
+      .card{ background:#fff; border:0; padding:0; margin:0; }
+      .field{ border:1px solid #ddd; background:#fff; }
+      input{ background:#fff; color:#111; border:1px solid #ddd; }
+      .kpi{ background:#fff; border:1px solid #ddd; }
+      .wrap{ max-width:none; padding:0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Semcasting</h1>
+          <div class="sub">Incremental Media Performance Calculator (Demo)</div>
+        </div>
+      </div>
+      <div class="actions noPrint">
+        <button id="copyBtn" type="button">Copy shareable link</button>
+        <button id="pdfBtn" class="primary" type="button">Download PDF report</button>
+        <button id="resetBtn" type="button">Reset to benchmarks</button>
+      </div>
+    </div>
+
+    <!-- INPUTS -->
+    <div class="card" id="inputsCard">
+      <p class="titlePrompt">
+        Please enter some basic business metrics to determine the impact of measurement for your financial organization.
+      </p>
+
+      <div class="row">
+        <div class="field">
+          <label for="budget">Estimated Display and CTV Digital Marketing Budget</label>
+          <div class="input-wrap">
+            <span class="prefix">$</span>
+            <input id="budget" class="money pad-left" inputmode="decimal" value="10,000,000.00" required>
+          </div>
+          <div class="hint">benchmark: $10,000,000</div>
+        </div>
+
+        <div class="field">
+          <label for="cpm">Estimated Blended CPM</label>
+          <div class="input-wrap">
+            <span class="prefix">$</span>
+            <input id="cpm" class="money pad-left" inputmode="decimal" value="15.00" required>
+          </div>
+          <div class="hint">benchmark: $15.00</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="ctr">Estimated Click-Through / View-Through Rate</label>
+          <div class="input-wrap percent-wrap">
+            <input id="ctr" class="percent pad-right" inputmode="decimal" maxlength="5" value="0.15" required>
+            <span class="suffix">%</span>
+          </div>
+          <div class="hint">benchmark: 0.15%</div>
+        </div>
+
+        <div class="field">
+          <label for="startRate">Estimated Application Start Rate</label>
+          <div class="input-wrap percent-wrap">
+            <input id="startRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="0.40" required>
+            <span class="suffix">%</span>
+          </div>
+          <div class="hint">benchmark: 0.40%</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="completionRate">Estimated Application Completion Rate</label>
+          <div class="input-wrap percent-wrap">
+            <input id="completionRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="40" required>
+            <span class="suffix">%</span>
+          </div>
+          <div class="hint">benchmark: 40%</div>
+        </div>
+
+        <div class="field">
+          <label for="fundedRate">Estimated Application Funded Rate</label>
+          <div class="input-wrap percent-wrap">
+            <input id="fundedRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="50" required>
+            <span class="suffix">%</span>
+          </div>
+          <div class="hint">benchmark: 50%</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="siteVisitors">Estimated Current Site Visitors (per year)</label>
+          <input id="siteVisitors" inputmode="numeric" value="1,200,000" required>
+          <div class="hint">benchmark: 1,200,000</div>
+        </div>
+
+        <div class="field">
+          <label for="ltv">Lifetime Value of a Funded Loan</label>
+          <div class="input-wrap">
+            <span class="prefix">$</span>
+            <input id="ltv" class="money pad-left" inputmode="decimal" value="9,000.00" required>
+          </div>
+          <div class="hint">benchmark: $9,000</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <div class="field">
+          <label for="notes">Notes (optional; included in PDF)</label>
+          <input id="notes" type="text" placeholder="Prospect name, campaign, assumptions…">
+          <div class="hint">benchmark: (optional)</div>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <div class="ctaRow noPrint">
+            <button id="calcBtn" class="primary ctaBig" type="button">Calculate</button>
+          </div>
+          <div id="err" class="err"></div>
+        </div>
+      </div>
+
+      <div class="foot">
+        For demo/testing purposes. Calculations are driven entirely by the inputs shown.
+      </div>
+    </div>
+
+    <!-- OUTPUTS (below inputs) -->
+    <div class="card" id="outputsCard">
+      <p class="outputsTitle">Outputs</p>
+
+      <div class="kpiGrid">
+        <div class="kpi">
+          <div class="k">All Impressions Delivered (Banner/CTV)</div>
+          <div class="v" id="o_impr">—</div>
+          <div class="m" id="o_impr_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Total Application Starts</div>
+          <div class="v" id="o_starts">—</div>
+          <div class="m" id="o_starts_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Total Application Completions</div>
+          <div class="v" id="o_comp">—</div>
+          <div class="m" id="o_comp_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Total Application Funded</div>
+          <div class="v" id="o_funded">—</div>
+          <div class="m" id="o_funded_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Lifetime Value of a Funded Loan</div>
+          <div class="v" id="o_ltv">—</div>
+          <div class="m" id="o_ltv_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Total Direct Revenue from Digital Advertising</div>
+          <div class="v" id="o_rev">—</div>
+          <div class="m" id="o_rev_mini">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const els = {
+    budget: $("budget"),
+    cpm: $("cpm"),
+    ctr: $("ctr"),
+    startRate: $("startRate"),
+    completionRate: $("completionRate"),
+    fundedRate: $("fundedRate"),
+    siteVisitors: $("siteVisitors"),
+    ltv: $("ltv"),
+    notes: $("notes"),
+
+    err: $("err"),
+    calcBtn: $("calcBtn"),
+    resetBtn: $("resetBtn"),
+    copyBtn: $("copyBtn"),
+    pdfBtn: $("pdfBtn"),
+
+    // outputs
+    o_impr: $("o_impr"),
+    o_impr_mini: $("o_impr_mini"),
+    o_starts: $("o_starts"),
+    o_starts_mini: $("o_starts_mini"),
+    o_comp: $("o_comp"),
+    o_comp_mini: $("o_comp_mini"),
+    o_funded: $("o_funded"),
+    o_funded_mini: $("o_funded_mini"),
+    o_ltv: $("o_ltv"),
+    o_ltv_mini: $("o_ltv_mini"),
+    o_rev: $("o_rev"),
+    o_rev_mini: $("o_rev_mini"),
+  };
+
+  // ---------- Formatting helpers ----------
+  function stripNonNumeric(s){
+    return (s || "").toString().replace(/[^0-9.]/g, "");
+  }
+  function parseNumberFromInput(el){
+    const raw = stripNonNumeric(el.value).replace(/(\..*)\./g, "$1");
+    const n = parseFloat(raw);
+    return isFinite(n) ? n : NaN;
+  }
+
+  function setFormattedCurrency(el, value){
+    if (!isFinite(value)) { el.value = ""; return; }
+    el.value = value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function setFormattedInteger(el, value){
+    if (!isFinite(value)) { el.value = ""; return; }
+    el.value = Math.round(value).toLocaleString(undefined, { maximumFractionDigits: 0 });
+  }
+  function setFormattedPercent(el, value){
+    if (!isFinite(value)) { el.value = ""; return; }
+    const v = Math.round(value * 100) / 100;
+    el.value = String(v).slice(0, 5);
+  }
+
+  function fmtMoney0(x){
+    if (!isFinite(x)) return "—";
+    return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
+  }
+  function fmtInt(x){
+    if (!isFinite(x)) return "—";
+    return x.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+
+  function showErr(msg){
+    els.err.style.display = msg ? "block" : "none";
+    els.err.textContent = msg || "";
+  }
+
+  // Enforce: percent inputs only, max 5 chars, max 2 decimals, 0-100 clamp
+  function attachPercentRules(id){
+    const el = $(id);
+    el.addEventListener("input", () => {
+      let v = el.value.replace(/[^0-9.]/g,'');
+      const parts = v.split('.');
+      if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+      if (v.includes('.')) {
+        const [a,b] = v.split('.');
+        v = a + '.' + (b ?? '').slice(0,2);
+      }
+      if (v.length > 5) v = v.slice(0,5);
+      el.value = v;
+    });
+
+    el.addEventListener("blur", () => {
+      const n = parseFloat(el.value || "0");
+      const clamped = Math.min(Math.max(isFinite(n) ? n : 0, 0), 100);
+      el.value = String(Math.round(clamped * 100) / 100).slice(0,5);
+    });
+  }
+
+  function wireCurrency(id, defaultValue){
+    const el = $(id);
+    el.addEventListener("focus", () => {
+      const n = parseNumberFromInput(el);
+      el.value = isFinite(n) ? String(n) : "";
+    });
+    el.addEventListener("blur", () => {
+      const n = parseNumberFromInput(el);
+      setFormattedCurrency(el, isFinite(n) ? n : defaultValue);
+    });
+  }
+
+  function wireInteger(id, defaultValue){
+    const el = $(id);
+    el.addEventListener("focus", () => {
+      const n = parseNumberFromInput(el);
+      el.value = isFinite(n) ? String(Math.round(n)) : "";
+    });
+    el.addEventListener("blur", () => {
+      const n = parseNumberFromInput(el);
+      setFormattedInteger(el, isFinite(n) ? n : defaultValue);
+    });
+  }
+
+  function pctToDecFromPercentValue(percentNumber, name){
+    if (!isFinite(percentNumber)) throw new Error(`${name} must be a number.`);
+    if (percentNumber < 0 || percentNumber > 100) throw new Error(`${name} must be between 0 and 100.`);
+    return percentNumber/100.0;
+  }
+
+  function readInputs(){
+    const budget = parseNumberFromInput(els.budget);
+    if (!isFinite(budget) || budget < 0) throw new Error("Budget must be a number ≥ 0.");
+
+    const cpm = parseNumberFromInput(els.cpm);
+    if (!isFinite(cpm) || cpm < 2) throw new Error("CPM must be a number ≥ 2.");
+
+    const ctrPct = parseNumberFromInput(els.ctr);
+    const startPct = parseNumberFromInput(els.startRate);
+    const compPct = parseNumberFromInput(els.completionRate);
+    const fundedPct = parseNumberFromInput(els.fundedRate);
+
+    const ctr = pctToDecFromPercentValue(ctrPct, "Estimated Click-Through / View-Through Rate (%)");
+    const startRate = pctToDecFromPercentValue(startPct, "Estimated Application Start Rate (%)");
+    const completionRate = pctToDecFromPercentValue(compPct, "Estimated Application Completion Rate (%)");
+    const fundedRate = pctToDecFromPercentValue(fundedPct, "Estimated Application Funded Rate (%)");
+
+    const siteVisitors = parseNumberFromInput(els.siteVisitors);
+    if (!isFinite(siteVisitors) || siteVisitors < 0) throw new Error("Site Visitors must be a number ≥ 0.");
+
+    const ltv = parseNumberFromInput(els.ltv);
+    if (!isFinite(ltv) || ltv < 0) throw new Error("Lifetime Value of a Funded Loan must be ≥ 0.");
+
+    return { budget, cpm, ctr, startRate, completionRate, fundedRate, siteVisitors, ltv };
+  }
+
+  function calc(){
+    try{
+      showErr("");
+      const i = readInputs();
+
+      // Impressions = (Budget ÷ CPM) × 1000
+      const impressions = (i.budget / i.cpm) * 1000;
+
+      // Starts = Impressions × CTR/VTR × Start Rate
+      const totalStarts = impressions * i.ctr * i.startRate;
+
+      // Completions = Starts × Completion Rate
+      const totalCompletions = totalStarts * i.completionRate;
+
+      // Funded = Completions × Funded Rate
+      const totalFunded = totalCompletions * i.fundedRate;
+
+      // Total Direct Revenue = Funded × LTV
+      const totalDirectRevenue = totalFunded * i.ltv;
+
+      // Render
+      els.o_impr.textContent = fmtInt(impressions);
+      els.o_impr_mini.textContent = "Computed as (Budget ÷ CPM) × 1000";
+
+      els.o_starts.textContent = fmtInt(totalStarts);
+      els.o_starts_mini.textContent = "Impressions × CTR/VTR × Application Start Rate";
+
+      els.o_comp.textContent = fmtInt(totalCompletions);
+      els.o_comp_mini.textContent = "Total Application Starts × Application Completion Rate";
+
+      els.o_funded.textContent = fmtInt(totalFunded);
+      els.o_funded_mini.textContent = "Total Application Completions × Application Funded Rate";
+
+      els.o_ltv.textContent = fmtMoney0(i.ltv);
+      els.o_ltv_mini.textContent = "Input: Lifetime Value of a Funded Loan";
+
+      els.o_rev.textContent = fmtMoney0(totalDirectRevenue);
+      els.o_rev_mini.textContent = "Total Application Funded × Lifetime Value of a Funded Loan";
+
+      syncUrl();
+      document.getElementById("outputsCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch(e){
+      showErr(e.message || "Check your inputs.");
+    }
+  }
+
+  function escapeHtml(str){
+    return (str || "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function getSnapshot(){
+    const now = new Date();
+    const iv = (id) => $(id).value;
+
+    const inputs = [
+      ["Estimated Display and CTV Digital Marketing Budget", "$" + escapeHtml(iv("budget"))],
+      ["Estimated Blended CPM", "$" + escapeHtml(iv("cpm"))],
+      ["Estimated Click-Through / View-Through Rate", escapeHtml(iv("ctr")) + "%"],
+      ["Estimated Application Start Rate", escapeHtml(iv("startRate")) + "%"],
+      ["Estimated Application Completion Rate", escapeHtml(iv("completionRate")) + "%"],
+      ["Estimated Application Funded Rate", escapeHtml(iv("fundedRate")) + "%"],
+      ["Estimated Current Site Visitors (per year)", escapeHtml(iv("siteVisitors"))],
+      ["Lifetime Value of a Funded Loan", "$" + escapeHtml(iv("ltv"))],
+    ];
+
+    const outputs = [
+      ["All Impressions Delivered (Banner/CTV)", escapeHtml(els.o_impr.textContent)],
+      ["Total Application Starts", escapeHtml(els.o_starts.textContent)],
+      ["Total Application Completions", escapeHtml(els.o_comp.textContent)],
+      ["Total Application Funded", escapeHtml(els.o_funded.textContent)],
+      ["Lifetime Value of a Funded Loan", escapeHtml(els.o_ltv.textContent)],
+      ["Total Direct Revenue from Digital Advertising", escapeHtml(els.o_rev.textContent)],
+    ];
+
+    return {
+      generatedAt: now.toLocaleString(),
+      notes: (els.notes.value || "").trim(),
+      shareLink: location.href,
+      inputs,
+      outputs
+    };
+  }
+
+  function openPdfReport(){
+    calc();
+    const snap = getSnapshot();
+
+    const style = `
+      <style>
+        @page { margin: 18mm; }
+        body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#111; }
+        .hdr{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+        .brand{ display:flex; align-items:center; gap:10px; }
+        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #4b78ff, #7aa2ff); }
+        h1{ font-size: 16px; margin:0; }
+        .meta{ font-size: 11px; color:#444; text-align:right; }
+        .sub{ margin: 10px 0 14px; color:#333; font-size:12px; line-height:1.35; }
+        .box{ border:1px solid #ddd; border-radius: 10px; padding: 12px; margin: 12px 0; }
+        h2{ font-size: 13px; margin: 0 0 10px; }
+        table{ width:100%; border-collapse: collapse; font-size: 12px; }
+        td{ padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+        td:first-child{ width: 64%; color:#222; }
+        td:last-child{ width: 36%; text-align:right; font-weight:600; }
+        .note{ font-size: 12px; color:#333; white-space: pre-wrap; }
+        .footer{ margin-top: 14px; font-size: 10px; color:#666; line-height:1.35; }
+        .pill{ display:inline-block; padding: 2px 8px; border:1px solid #e5e5e5; border-radius:999px; font-size:11px; color:#444; }
+        @media print{ .noprint{ display:none; } }
+      </style>
+    `;
+
+    const rows = (arr) => arr.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+
+    const html = `
+      <!doctype html>
+      <html>
+      <head><meta charset="utf-8">${style}<title>Semcasting Report</title></head>
+      <body>
+        <div class="hdr">
+          <div class="brand">
+            <div class="logo" aria-hidden="true"></div>
+            <div>
+              <h1>Semcasting — Incremental Media Performance (Demo Report)</h1>
+              <div class="sub" style="margin:4px 0 0; font-size:11px; color:#555;">
+                Financial Organization Planning Outputs
+              </div>
+            </div>
+          </div>
+          <div class="meta">
+            <div><span class="pill">Generated</span> ${escapeHtml(snap.generatedAt)}</div>
+          </div>
+        </div>
+
+        <div class="sub">
+          Impressions are computed as <b>(Budget ÷ CPM) × 1000</b>.
+        </div>
+
+        ${snap.notes ? `
+          <div class="box">
+            <h2>Notes</h2>
+            <div class="note">${escapeHtml(snap.notes)}</div>
+          </div>
+        ` : ""}
+
+        <div class="box">
+          <h2>Inputs</h2>
+          <table>${rows(snap.inputs)}</table>
+        </div>
+
+        <div class="box">
+          <h2>Outputs</h2>
+          <table>${rows(snap.outputs)}</table>
+        </div>
+
+        <div class="footer">
+          Shareable link: ${escapeHtml(snap.shareLink)}<br/>
+          For demo/testing purposes. © ${new Date().getFullYear()} Semcasting.
+        </div>
+
+        <div class="noprint" style="margin-top:14px;">
+          <button onclick="window.print()" style="padding:10px 12px; border:1px solid #bbb; border-radius:10px; background:#fff; cursor:pointer;">
+            Print / Save as PDF
+          </button>
+        </div>
+
+        <script>setTimeout(() => window.print(), 250);</script>
+      </body>
+      </html>
+    `;
+
+    const w = window.open("", "_blank", "noopener,noreferrer");
+    if (!w) return;
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
+
+  function syncUrl(){
+    const num = (id) => {
+      const v = parseNumberFromInput($(id));
+      return isFinite(v) ? String(v) : "";
+    };
+    const params = new URLSearchParams({
+      b: num("budget"),
+      cpm: num("cpm"),
+      ctr: num("ctr"),
+      sr: num("startRate"),
+      cr: num("completionRate"),
+      fr: num("fundedRate"),
+      sv: num("siteVisitors"),
+      ltv: num("ltv"),
+      n: els.notes.value || ""
+    });
+    history.replaceState(null, "", `${location.origin}${location.pathname}?${params.toString()}`);
+  }
+
+  function loadFromUrl(){
+    const p = new URLSearchParams(location.search);
+    if (!p.toString()) return;
+
+    const setNum = (key, elId, formatFn) => {
+      if (!p.has(key)) return;
+      const n = parseFloat(p.get(key));
+      if (!isFinite(n)) return;
+      formatFn($(elId), n);
+    };
+
+    setNum("b","budget", setFormattedCurrency);
+    setNum("cpm","cpm", setFormattedCurrency);
+    setNum("ltv","ltv", setFormattedCurrency);
+
+    setNum("ctr","ctr", setFormattedPercent);
+    setNum("sr","startRate", setFormattedPercent);
+    setNum("cr","completionRate", setFormattedPercent);
+    setNum("fr","fundedRate", setFormattedPercent);
+
+    setNum("sv","siteVisitors", setFormattedInteger);
+
+    if (p.has("n")) $("notes").value = p.get("n");
+  }
+
+  function copyShareLink(){
+    navigator.clipboard.writeText(location.href).then(()=>{
+      els.copyBtn.textContent = "Link copied";
+      setTimeout(()=> els.copyBtn.textContent = "Copy shareable link", 1200);
+    }).catch(()=>{
+      els.copyBtn.textContent = "Copy failed";
+      setTimeout(()=> els.copyBtn.textContent = "Copy shareable link", 1200);
+    });
+  }
+
+  function resetBenchmarks(){
+    setFormattedCurrency(els.budget, 10000000);
+    setFormattedCurrency(els.cpm, 15);
+    setFormattedPercent(els.ctr, 0.15);
+    setFormattedPercent(els.startRate, 0.40);
+    setFormattedPercent(els.completionRate, 40);
+    setFormattedPercent(els.fundedRate, 50);
+    setFormattedInteger(els.siteVisitors, 1200000);
+    setFormattedCurrency(els.ltv, 9000);
+    els.notes.value = "";
+    showErr("");
+    // Clear outputs until Calculate is clicked
+    els.o_impr.textContent = "—";
+    els.o_starts.textContent = "—";
+    els.o_comp.textContent = "—";
+    els.o_funded.textContent = "—";
+    els.o_ltv.textContent = "—";
+    els.o_rev.textContent = "—";
+    els.o_impr_mini.textContent = "—";
+    els.o_starts_mini.textContent = "—";
+    els.o_comp_mini.textContent = "—";
+    els.o_funded_mini.textContent = "—";
+    els.o_ltv_mini.textContent = "—";
+    els.o_rev_mini.textContent = "—";
+    syncUrl();
+  }
+
+  // Wire formatting behaviors
+  wireCurrency("budget", 10000000);
+  wireCurrency("cpm", 15);
+  wireCurrency("ltv", 9000);
+  wireInteger("siteVisitors", 1200000);
+
+  // Percent rules (visual width enforced via CSS + maxlength=5 + JS cap)
+  ["ctr","startRate","completionRate","fundedRate"].forEach(attachPercentRules);
+
+  // Init formatting + URL load
+  loadFromUrl();
+  if (!location.search) resetBenchmarks();
+
+  // Buttons
+  els.calcBtn.addEventListener("click", calc);
+  els.resetBtn.addEventListener("click", resetBenchmarks);
+  els.copyBtn.addEventListener("click", copyShareLink);
+  els.pdfBtn.addEventListener("click", openPdfReport);
+</script>
+</body>
+</html>
