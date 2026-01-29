@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Semcasting | Incremental Media Performance Calculator (Demo)</title>
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --card:#121a2a;
+      --card2:#0f1626;
+      --border:#22304d;
+      --border2:#2a3a5e;
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.78);
+      --muted2:rgba(232,238,252,.65);
+      --accent:#4b78ff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    .wrap{ max-width: 1120px; margin: 0 auto; padding: 24px 18px 48px; }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding: 10px 12px; border: 1px solid var(--border);
+      background: rgba(18,26,42,.75); border-radius: 14px;
+      backdrop-filter: blur(6px);
+    }
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: linear-gradient(135deg, var(--accent), #7aa2ff);
+      box-shadow: 0 10px 24px rgba(75,120,255,.25);
+    }
+    .brand h1{ font-size: 15px; margin:0; letter-spacing:.2px; }
+    .brand .sub{ font-size: 12px; color: var(--muted2); margin: 2px 0 0; }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    button{
+      border:1px solid var(--border2); background:#0b1220; color:var(--text);
+      border-radius: 10px; padding: 10px 12px; cursor:pointer; font-size: 13px;
+    }
+    button:hover{ border-color: var(--accent); }
+    .primary{
+      border-color: rgba(75,120,255,.65);
+      background: rgba(75,120,255,.14);
+    }
+    .primary:hover{ border-color: var(--accent); background: rgba(75,120,255,.18); }
+
+    .headline{ margin: 14px 2px 18px; }
+    .headline h2{ margin:0 0 6px; font-size: 20px; }
+    .headline p{ margin:0; color: var(--muted); line-height: 1.35; }
+
+    .grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 980px){ .grid{ grid-template-columns: 1.05fr .95fr; } }
+
+    .card{ background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .card h3{ margin:0 0 10px; font-size: 14px; color: var(--muted); letter-spacing:.25px; }
+    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
+    @media (min-width: 560px){ .row{ grid-template-columns: 1fr 1fr; } }
+    .field{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 10px; }
+    label{ display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input{
+      width:100%; box-sizing:border-box;
+      padding: 10px 10px; border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: #0b1220; color: var(--text);
+      font-size: 14px; outline: none;
+    }
+    input:focus{ border-color: var(--accent); }
+    .hint{ font-size: 11px; color: var(--muted2); margin-top: 6px; line-height:1.25; }
+    .divider{ height:1px; background: rgba(34,48,77,.9); margin: 12px 0; }
+
+    .kpi{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+    .kpi .item{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+    .kpi .name{ font-size: 12px; color: var(--muted); }
+    .kpi .val{ font-size: 20px; margin-top: 4px; }
+    .kpi .mini{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height:1.25; }
+
+    .err{ color:#ffb4b4; font-size: 12px; margin-top: 10px; display:none; }
+    .foot{ margin-top: 14px; font-size: 11px; color: var(--muted2); line-height: 1.35; }
+    .pill{
+      display:inline-block; font-size: 11px; color: var(--muted);
+      border:1px solid var(--border); padding: 4px 8px; border-radius: 999px;
+      background: rgba(15,22,38,.6);
+    }
+
+    /* Print-friendly report (for the popup window) */
+    .report{ color:#111; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Semcasting</h1>
+          <div class="sub">Incremental Media Performance Calculator (Demo)</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="copyBtn" type="button">Copy shareable link</button>
+        <button id="pdfBtn" class="primary" type="button">Download PDF report</button>
+        <button id="resetBtn" type="button">Reset to Benchmark</button>
+      </div>
+    </div>
+
+    <div class="headline">
+      <h2>Mortgage Lenders — “Same Budget / Better Performance”</h2>
+      <p>
+        Outputs mirror your Excel fields and structure. Impressions are computed as <span class="pill">(Budget ÷ CPM) × 1000</span>.
+      </p>
+    </div>
+
+    <div class="grid">
+      <!-- INPUTS -->
+      <div class="card">
+        <h3>Inputs (Benchmark defaults)</h3>
+
+        <div class="row">
+          <div class="field">
+            <label for="budget">Estimated Display and CTV Digital Marketing Budget ($)</label>
+            <input id="budget" type="number" min="0" step="0.01" value="10000000" required>
+            <div class="hint">Excel Benchmark: $10,000,000</div>
+          </div>
+          <div class="field">
+            <label for="cpm">Estimated Blended CPM ($)</label>
+            <input id="cpm" type="number" min="2" step="0.01" value="15" required>
+            <div class="hint">Excel Benchmark: $15</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="ctr">Estimated Click-Through/View Through Rate (%)</label>
+            <input id="ctr" type="number" min="0" max="100" step="0.0001" value="0.15" required>
+            <div class="hint">Excel Benchmark: 0.15% (stored as 0.0015)</div>
+          </div>
+          <div class="field">
+            <label for="startRate">Estimated Application Start Rate (%)</label>
+            <input id="startRate" type="number" min="0" max="100" step="0.0001" value="0.40" required>
+            <div class="hint">Excel Benchmark: 0.40% (stored as 0.004)</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="completionRate">Estimated Application Completion Rate (%)</label>
+            <input id="completionRate" type="number" min="0" max="100" step="0.01" value="40" required>
+            <div class="hint">Excel Benchmark: 40%</div>
+          </div>
+          <div class="field">
+            <label for="fundedRate">Estimated Application Funded Rate (%)</label>
+            <input id="fundedRate" type="number" min="0" max="100" step="0.01" value="50" required>
+            <div class="hint">Excel Benchmark: 50%</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="ltv">Lifetime Value Per Funded Loan ($)</label>
+            <input id="ltv" type="number" min="0" step="1" value="10000" required>
+            <div class="hint">Excel Benchmark: $10,000</div>
+          </div>
+          <div class="field">
+            <label for="rounding">Volume rounding (decimals)</label>
+            <input id="rounding" type="number" min="0" max="6" step="1" value="0">
+            <div class="hint">0 = whole numbers (recommended for exec demos)</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>Implementation of Media Measurement and Identity Tools (visible by default)</h3>
+
+        <div class="row">
+          <div class="field">
+            <label for="suppr">Supression against current customers (%)</label>
+            <input id="suppr" type="number" min="0" max="100" step="0.01" value="10" required>
+            <div class="hint">Excel Benchmark: 10% (informational; not used in formulas in the sheet)</div>
+          </div>
+          <div class="field">
+            <label for="freqCtl">Control Actual Impression Frequency (over/under exposed across media) (%)</label>
+            <input id="freqCtl" type="number" min="0" max="100" step="0.01" value="10" required>
+            <div class="hint">Excel Benchmark: 10% (informational; not used in formulas in the sheet)</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="incrImpr">Increased Impression Levels (Incremental Impressions)</label>
+            <input id="incrImpr" type="number" min="0" step="1" value="350000000" required>
+            <div class="hint">Excel Benchmark: 350,000,000</div>
+          </div>
+          <div class="field">
+            <label for="siteVisitors">Current Site Visitors</label>
+            <input id="siteVisitors" type="number" min="0" step="1" value="1200000" required>
+            <div class="hint">Excel Benchmark: 1,200,000</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="siteIdPct">Current Site % of Visitors Identified (%)</label>
+            <input id="siteIdPct" type="number" min="0" max="100" step="0.01" value="45" required>
+            <div class="hint">Excel Benchmark: 45% (stored as 0.45)</div>
+          </div>
+          <div class="field">
+            <label for="addlIdPct">With ID tech — Additional Site Visitors Identified (%)</label>
+            <input id="addlIdPct" type="number" min="0" max="100" step="0.01" value="35" required>
+            <div class="hint">Excel Benchmark: 35% (stored as 0.35)</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="retCtr">Incremental Site Visitors CTR/VCTR (%)</label>
+            <input id="retCtr" type="number" min="0" max="100" step="0.0001" value="0.70" required>
+            <div class="hint">Excel Benchmark: 0.70% (stored as 0.007)</div>
+          </div>
+          <div class="field">
+            <label for="retConv">Estimated Conversion Rate (%)</label>
+            <input id="retConv" type="number" min="0" max="100" step="0.0001" value="0.70" required>
+            <div class="hint">Excel Benchmark: 0.70% (stored as 0.007)</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="retValue">Value Per Funded Loan ($)</label>
+            <input id="retValue" type="number" min="0" step="1" value="10000" required>
+            <div class="hint">Excel Benchmark: $10,000</div>
+          </div>
+          <div class="field">
+            <label for="notes">Notes (optional; included in PDF)</label>
+            <input id="notes" type="text" placeholder="e.g., Prospect name, campaign, assumptions…">
+            <div class="hint">Not used in calculations</div>
+          </div>
+        </div>
+
+        <div id="err" class="err"></div>
+
+        <div class="foot">
+          Light branding only. If you want stronger brand treatment (logo image, fonts, etc.), tell me what assets you want to use.
+        </div>
+      </div>
+
+      <!-- OUTPUTS -->
+      <div class="card">
+        <h3>Outputs (Excel labels)</h3>
+
+        <div class="kpi">
+          <!-- CURRENT DIGITAL MARKETING PROCESS -->
+          <div class="item">
+            <div class="name">All Impressions Delivered (Banner/CTV)</div>
+            <div class="val" id="o_impr">—</div>
+            <div class="mini" id="o_impr_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Total Application Starts</div>
+            <div class="val" id="o_starts">—</div>
+            <div class="mini" id="o_starts_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Total Application Completion</div>
+            <div class="val" id="o_comp">—</div>
+            <div class="mini" id="o_comp_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Total Application Funded</div>
+            <div class="val" id="o_funded">—</div>
+            <div class="mini" id="o_funded_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Total Direct Revenue from Digital Advertising</div>
+            <div class="val" id="o_rev">—</div>
+            <div class="mini" id="o_rev_mini">—</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- FINANCIAL IMPACT TO MEDIA -->
+          <div class="item">
+            <div class="name">Increased Impression Levels</div>
+            <div class="val" id="o_incr_impr">—</div>
+            <div class="mini" id="o_incr_impr_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Monetary Value of Added Impressions</div>
+            <div class="val" id="o_added_value">—</div>
+            <div class="mini" id="o_added_value_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Total Incremental Application Funded</div>
+            <div class="val" id="o_incr_funded">—</div>
+            <div class="mini" id="o_incr_funded_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Incremental Direct Revenue</div>
+            <div class="val" id="o_incr_rev_impr">—</div>
+            <div class="mini" id="o_incr_rev_impr_mini">—</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- BETTER RETARGETING -->
+          <div class="item">
+            <div class="name">Current Site Visitors Identified</div>
+            <div class="val" id="o_site_id">—</div>
+            <div class="mini" id="o_site_id_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Additional Site Visitors Identified</div>
+            <div class="val" id="o_addl_site_id">—</div>
+            <div class="mini" id="o_addl_site_id_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Additional Conversions</div>
+            <div class="val" id="o_addl_conv">—</div>
+            <div class="mini" id="o_addl_conv_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Incremental Revenue from Increased Retargeting</div>
+            <div class="val" id="o_incr_rev_ret">—</div>
+            <div class="mini" id="o_incr_rev_ret_mini">—</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- FINANCIAL SUMMARY IMPACT -->
+          <div class="item">
+            <div class="name">Incremental Value of Added Impressions</div>
+            <div class="val" id="o_added_value_2">—</div>
+            <div class="mini" id="o_added_value_2_mini">—</div>
+          </div>
+
+          <div class="item">
+            <div class="name">Incremental Direct Revenue</div>
+            <div class="val" id="o_total_incr">—</div>
+            <div class="mini" id="o_total_incr_mini">—</div>
+          </div>
+        </div>
+
+        <div class="foot">
+          Report exports exactly what you see here. Use “Download PDF report” → Save as PDF.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const els = {
+    budget: $("budget"),
+    cpm: $("cpm"),
+    ctr: $("ctr"),
+    startRate: $("startRate"),
+    completionRate: $("completionRate"),
+    fundedRate: $("fundedRate"),
+    ltv: $("ltv"),
+    rounding: $("rounding"),
+
+    suppr: $("suppr"),
+    freqCtl: $("freqCtl"),
+    incrImpr: $("incrImpr"),
+    siteVisitors: $("siteVisitors"),
+    siteIdPct: $("siteIdPct"),
+    addlIdPct: $("addlIdPct"),
+    retCtr: $("retCtr"),
+    retConv: $("retConv"),
+    retValue: $("retValue"),
+    notes: $("notes"),
+
+    err: $("err"),
+    resetBtn: $("resetBtn"),
+    copyBtn: $("copyBtn"),
+    pdfBtn: $("pdfBtn"),
+
+    // outputs
+    o_impr: $("o_impr"),
+    o_impr_mini: $("o_impr_mini"),
+
+    o_starts: $("o_starts"),
+    o_starts_mini: $("o_starts_mini"),
+
+    o_comp: $("o_comp"),
+    o_comp_mini: $("o_comp_mini"),
+
+    o_funded: $("o_funded"),
+    o_funded_mini: $("o_funded_mini"),
+
+    o_rev: $("o_rev"),
+    o_rev_mini: $("o_rev_mini"),
+
+    o_incr_impr: $("o_incr_impr"),
+    o_incr_impr_mini: $("o_incr_impr_mini"),
+
+    o_added_value: $("o_added_value"),
+    o_added_value_mini: $("o_added_value_mini"),
+
+    o_incr_funded: $("o_incr_funded"),
+    o_incr_funded_mini: $("o_incr_funded_mini"),
+
+    o_incr_rev_impr: $("o_incr_rev_impr"),
+    o_incr_rev_impr_mini: $("o_incr_rev_impr_mini"),
+
+    o_site_id: $("o_site_id"),
+    o_site_id_mini: $("o_site_id_mini"),
+
+    o_addl_site_id: $("o_addl_site_id"),
+    o_addl_site_id_mini: $("o_addl_site_id_mini"),
+
+    o_addl_conv: $("o_addl_conv"),
+    o_addl_conv_mini: $("o_addl_conv_mini"),
+
+    o_incr_rev_ret: $("o_incr_rev_ret"),
+    o_incr_rev_ret_mini: $("o_incr_rev_ret_mini"),
+
+    o_added_value_2: $("o_added_value_2"),
+    o_added_value_2_mini: $("o_added_value_2_mini"),
+
+    o_total_incr: $("o_total_incr"),
+    o_total_incr_mini: $("o_total_incr_mini"),
+  };
+
+  const defaultsBenchmark = {
+    budget: 10000000,
+    cpm: 15,
+    ctrPct: 0.15,
+    startRatePct: 0.40,
+    completionRatePct: 40,
+    fundedRatePct: 50,
+    ltv: 10000,
+    rounding: 0,
+
+    supprPct: 10,
+    freqCtlPct: 10,
+    incrImpr: 350000000,
+    siteVisitors: 1200000,
+    siteIdPct: 45,
+    addlIdPct: 35,
+    retCtrPct: 0.70,
+    retConvPct: 0.70,
+    retValue: 10000,
+    notes: ""
+  };
+
+  function fmtMoney0(x){
+    if (!isFinite(x)) return "—";
+    return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
+  }
+  function fmtMoney2(x){
+    if (!isFinite(x)) return "—";
+    return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:2});
+  }
+  function fmtInt(x){
+    if (!isFinite(x)) return "—";
+    return x.toLocaleString(undefined,{maximumFractionDigits:0});
+  }
+  function fmtNum(x, dp){
+    if (!isFinite(x)) return "—";
+    return x.toLocaleString(undefined,{minimumFractionDigits:dp, maximumFractionDigits:dp});
+  }
+
+  function showErr(msg){
+    els.err.style.display = msg ? "block" : "none";
+    els.err.textContent = msg || "";
+  }
+
+  function pctToDec(v, name){
+    const n = parseFloat(v);
+    if (!isFinite(n)) throw new Error(`${name} must be a number.`);
+    if (n < 0 || n > 100) throw new Error(`${name} must be between 0 and 100.`);
+    return n/100.0;
+  }
+
+  function readInputs(){
+    const rounding = parseInt(els.rounding.value,10);
+    if (!isFinite(rounding) || rounding < 0 || rounding > 6) throw new Error("Rounding must be 0–6.");
+
+    const budget = parseFloat(els.budget.value);
+    if (!isFinite(budget) || budget < 0) throw new Error("Budget must be a number ≥ 0.");
+
+    const cpm = parseFloat(els.cpm.value);
+    if (!isFinite(cpm) || cpm < 2) throw new Error("CPM must be a number ≥ 2.");
+
+    const ctr = pctToDec(els.ctr.value, "Estimated Click-Through/View Through Rate (%)");
+    const startRate = pctToDec(els.startRate.value, "Estimated Application Start Rate (%)");
+    const completionRate = pctToDec(els.completionRate.value, "Estimated Application Completion Rate (%)");
+    const fundedRate = pctToDec(els.fundedRate.value, "Estimated Application Funded Rate (%)");
+
+    const ltv = parseFloat(els.ltv.value);
+    if (!isFinite(ltv) || ltv < 0) throw new Error("Lifetime Value Per Funded Loan must be ≥ 0.");
+
+    const incrImpr = parseFloat(els.incrImpr.value);
+    if (!isFinite(incrImpr) || incrImpr < 0) throw new Error("Increased Impression Levels must be ≥ 0.");
+
+    const siteVisitors = parseFloat(els.siteVisitors.value);
+    if (!isFinite(siteVisitors) || siteVisitors < 0) throw new Error("Current Site Visitors must be ≥ 0.");
+
+    const siteIdPct = pctToDec(els.siteIdPct.value, "Current Site % of Visitors Identified (%)");
+    const addlIdPct = pctToDec(els.addlIdPct.value, "With ID tech — Additional Site Visitors Identified (%)");
+
+    const retCtr = pctToDec(els.retCtr.value, "Incremental Site Visitors CTR/VCTR (%)");
+    const retConv = pctToDec(els.retConv.value, "Estimated Conversion Rate (%)");
+
+    const retValue = parseFloat(els.retValue.value);
+    if (!isFinite(retValue) || retValue < 0) throw new Error("Value Per Funded Loan must be ≥ 0.");
+
+    // informational only in the sheet
+    pctToDec(els.suppr.value, "Supression (%)");
+    pctToDec(els.freqCtl.value, "Control Actual Impression Frequency (%)");
+
+    return {
+      rounding, budget, cpm, ctr, startRate, completionRate, fundedRate, ltv,
+      incrImpr, siteVisitors, siteIdPct, addlIdPct, retCtr, retConv, retValue,
+      notes: (els.notes.value || "").trim()
+    };
+  }
+
+  function roundVol(x, dp){
+    const p = Math.pow(10, dp);
+    return Math.round(x*p)/p;
+  }
+
+  function calc(){
+    try{
+      showErr("");
+      const i = readInputs();
+
+      // ===== CURRENT DIGITAL MARKETING PROCESS (Excel logic) =====
+      // All Impressions Delivered (Banner/CTV) = (Budget / CPM) * 1000
+      const impressions = (i.cpm > 0) ? (i.budget / i.cpm) * 1000 : 0;
+
+      // Total Application Starts = Impressions * CTR/VTR * StartRate
+      const totalStarts = impressions * i.ctr * i.startRate;
+
+      // Total Application Completion = Starts * CompletionRate
+      const totalCompletion = totalStarts * i.completionRate;
+
+      // Total Application Funded = Completion * FundedRate
+      const totalFunded = totalCompletion * i.fundedRate;
+
+      // Total Direct Revenue from Digital Advertising = Funded * LTV
+      const totalDirectRevenue = totalFunded * i.ltv;
+
+      // ===== FINANCIAL IMPACT TO MEDIA =====
+      // Increased Impression Levels = input
+      const increasedImpressions = i.incrImpr;
+
+      // Monetary Value of Added Impressions = (IncrImpr/1000) * CPM
+      const monetaryValueAddedImpr = (increasedImpressions / 1000) * i.cpm;
+
+      // Total Incremental Application Funded = incrImpr * CTR * Start * Completion * Funded
+      const totalIncrFunded = increasedImpressions * i.ctr * i.startRate * i.completionRate * i.fundedRate;
+
+      // Incremental Direct Revenue (Increased Impressions) = totalIncrFunded * LTV
+      const incrDirectRevenueImpr = totalIncrFunded * i.ltv;
+
+      // ===== BETTER RETARGETING =====
+      // Current Site Visitors Identified = siteVisitors * siteIdPct
+      const currentSiteId = i.siteVisitors * i.siteIdPct;
+
+      // Additional Site Visitors Identified = siteVisitors * addlIdPct
+      const addlSiteId = i.siteVisitors * i.addlIdPct;
+
+      // Additional Conversions = addlSiteId * retCtr * retConv
+      const addlConversions = addlSiteId * i.retCtr * i.retConv;
+
+      // Incremental Revenue from Increased Retargeting = addlConversions * retValue
+      const incrRevenueRetargeting = addlConversions * i.retValue;
+
+      // ===== FINANCIAL SUMMARY IMPACT =====
+      // Incremental Value of Added Impressions repeats monetaryValueAddedImpr
+      // Incremental Direct Revenue (total) = incrRevenueRetargeting + incrDirectRevenueImpr
+      const totalIncrementalDirectRevenue = incrRevenueRetargeting + incrDirectRevenueImpr;
+
+      // ===== Render outputs (Excel labels) =====
+      const dp = i.rounding;
+
+      els.o_impr.textContent = fmtInt(roundVol(impressions, 0));
+      els.o_impr_mini.textContent = `Computed as (Budget ÷ CPM) × 1000 = ${fmtMoney2(i.budget)} ÷ ${fmtMoney2(i.cpm)} × 1000`;
+
+      els.o_starts.textContent = (dp===0) ? fmtInt(roundVol(totalStarts,0)) : fmtNum(roundVol(totalStarts,dp),dp);
+      els.o_starts_mini.textContent = `Impressions × CTR/VTR × Start Rate`;
+
+      els.o_comp.textContent = (dp===0) ? fmtInt(roundVol(totalCompletion,0)) : fmtNum(roundVol(totalCompletion,dp),dp);
+      els.o_comp_mini.textContent = `Starts × Completion Rate`;
+
+      els.o_funded.textContent = (dp===0) ? fmtInt(roundVol(totalFunded,0)) : fmtNum(roundVol(totalFunded,dp),dp);
+      els.o_funded_mini.textContent = `Completion × Funded Rate • Cost/Funded: ${totalFunded>0 ? fmtMoney2(i.budget/totalFunded) : "—"}`;
+
+      els.o_rev.textContent = fmtMoney0(totalDirectRevenue);
+      els.o_rev_mini.textContent = `Funded × Lifetime Value Per Funded Loan (${fmtMoney2(i.ltv)})`;
+
+      els.o_incr_impr.textContent = fmtInt(roundVol(increasedImpressions,0));
+      els.o_incr_impr_mini.textContent = `Input: Increased Impression Levels`;
+
+      els.o_added_value.textContent = fmtMoney0(monetaryValueAddedImpr);
+      els.o_added_value_mini.textContent = `(Incr Impr ÷ 1000) × CPM`;
+
+      els.o_incr_funded.textContent = (dp===0) ? fmtInt(roundVol(totalIncrFunded,0)) : fmtNum(roundVol(totalIncrFunded,dp),dp);
+      els.o_incr_funded_mini.textContent = `Incr Impr × CTR/VTR × Start × Completion × Funded`;
+
+      els.o_incr_rev_impr.textContent = fmtMoney0(incrDirectRevenueImpr);
+      els.o_incr_rev_impr_mini.textContent = `Total Incremental Application Funded × LTV`;
+
+      els.o_site_id.textContent = fmtInt(roundVol(currentSiteId,0));
+      els.o_site_id_mini.textContent = `Current Site Visitors × Current Site % Identified`;
+
+      els.o_addl_site_id.textContent = fmtInt(roundVol(addlSiteId,0));
+      els.o_addl_site_id_mini.textContent = `Current Site Visitors × Additional Identified %`;
+
+      els.o_addl_conv.textContent = (dp===0) ? fmtInt(roundVol(addlConversions,0)) : fmtNum(roundVol(addlConversions,dp),dp);
+      els.o_addl_conv_mini.textContent = `Additional Identified × Incremental CTR/VCTR × Conversion Rate`;
+
+      els.o_incr_rev_ret.textContent = fmtMoney0(incrRevenueRetargeting);
+      els.o_incr_rev_ret_mini.textContent = `Additional Conversions × Value Per Funded Loan`;
+
+      els.o_added_value_2.textContent = fmtMoney0(monetaryValueAddedImpr);
+      els.o_added_value_2_mini.textContent = `Same as Monetary Value of Added Impressions`;
+
+      els.o_total_incr.textContent = fmtMoney0(totalIncrementalDirectRevenue);
+      els.o_total_incr_mini.textContent = `Incremental Direct Revenue = (Retargeting) + (Increased Impressions)`;
+
+      syncUrl();
+    } catch(e){
+      showErr(e.message || "Check your inputs.");
+      [
+        "o_impr","o_starts","o_comp","o_funded","o_rev",
+        "o_incr_impr","o_added_value","o_incr_funded","o_incr_rev_impr",
+        "o_site_id","o_addl_site_id","o_addl_conv","o_incr_rev_ret",
+        "o_added_value_2","o_total_incr"
+      ].forEach(id => $(id).textContent = "—");
+    }
+  }
+
+  function resetBenchmark(){
+    const d = defaultsBenchmark;
+    els.budget.value = d.budget;
+    els.cpm.value = d.cpm;
+    els.ctr.value = d.ctrPct;
+    els.startRate.value = d.startRatePct;
+    els.completionRate.value = d.completionRatePct;
+    els.fundedRate.value = d.fundedRatePct;
+    els.ltv.value = d.ltv;
+    els.rounding.value = d.rounding;
+
+    els.suppr.value = d.supprPct;
+    els.freqCtl.value = d.freqCtlPct;
+    els.incrImpr.value = d.incrImpr;
+    els.siteVisitors.value = d.siteVisitors;
+    els.siteIdPct.value = d.siteIdPct;
+    els.addlIdPct.value = d.addlIdPct;
+    els.retCtr.value = d.retCtrPct;
+    els.retConv.value = d.retConvPct;
+    els.retValue.value = d.retValue;
+    els.notes.value = d.notes;
+
+    calc();
+  }
+
+  function syncUrl(){
+    const params = new URLSearchParams({
+      b: els.budget.value,
+      cpm: els.cpm.value,
+      ctr: els.ctr.value,
+      sr: els.startRate.value,
+      cr: els.completionRate.value,
+      fr: els.fundedRate.value,
+      ltv: els.ltv.value,
+      r: els.rounding.value,
+
+      sup: els.suppr.value,
+      fq: els.freqCtl.value,
+      ii: els.incrImpr.value,
+      sv: els.siteVisitors.value,
+      sip: els.siteIdPct.value,
+      aip: els.addlIdPct.value,
+      rc: els.retCtr.value,
+      rv: els.retConv.value,
+      rval: els.retValue.value,
+      n: els.notes.value || ""
+    });
+    history.replaceState(null, "", `${location.origin}${location.pathname}?${params.toString()}`);
+  }
+
+  function loadFromUrl(){
+    const p = new URLSearchParams(location.search);
+    if (!p.toString()) return;
+
+    const setIf = (key, el) => { if (p.has(key)) el.value = p.get(key); };
+    setIf("b", els.budget);
+    setIf("cpm", els.cpm);
+    setIf("ctr", els.ctr);
+    setIf("sr", els.startRate);
+    setIf("cr", els.completionRate);
+    setIf("fr", els.fundedRate);
+    setIf("ltv", els.ltv);
+    setIf("r", els.rounding);
+
+    setIf("sup", els.suppr);
+    setIf("fq", els.freqCtl);
+    setIf("ii", els.incrImpr);
+    setIf("sv", els.siteVisitors);
+    setIf("sip", els.siteIdPct);
+    setIf("aip", els.addlIdPct);
+    setIf("rc", els.retCtr);
+    setIf("rv", els.retConv);
+    setIf("rval", els.retValue);
+    setIf("n", els.notes);
+  }
+
+  function copyShareLink(){
+    navigator.clipboard.writeText(location.href).then(()=>{
+      els.copyBtn.textContent = "Link copied";
+      setTimeout(()=> els.copyBtn.textContent = "Copy shareable link", 1200);
+    }).catch(()=>{
+      els.copyBtn.textContent = "Copy failed";
+      setTimeout(()=> els.copyBtn.textContent = "Copy shareable link", 1200);
+    });
+  }
+
+  function getSnapshot(){
+    // Grab inputs + outputs as currently rendered for PDF report
+    const now = new Date();
+    const inputs = [
+      ["Estimated Display and CTV Digital Marketing Budget", fmtMoney2(parseFloat(els.budget.value))],
+      ["Estimated Blended CPM", fmtMoney2(parseFloat(els.cpm.value))],
+      ["Estimated Click-Through/View Through Rate", `${els.ctr.value}%`],
+      ["Estimated Application Start Rate", `${els.startRate.value}%`],
+      ["Estimated Application Completion Rate", `${els.completionRate.value}%`],
+      ["Estimated Application Funded Rate", `${els.fundedRate.value}%`],
+      ["Lifetime Value Per Funded Loan", fmtMoney2(parseFloat(els.ltv.value))],
+
+      ["Supression against current customers", `${els.suppr.value}%`],
+      ["Control Actual Impression Frequency", `${els.freqCtl.value}%`],
+      ["Increased Impression Levels", fmtInt(parseFloat(els.incrImpr.value))],
+      ["Current Site Visitors", fmtInt(parseFloat(els.siteVisitors.value))],
+      ["Current Site % of Visitors Identified", `${els.siteIdPct.value}%`],
+      ["With ID tech — Additional Site Visitors Identified", `${els.addlIdPct.value}%`],
+      ["Incremental Site Visitors CTR/VCTR", `${els.retCtr.value}%`],
+      ["Estimated Conversion Rate", `${els.retConv.value}%`],
+      ["Value Per Funded Loan", fmtMoney2(parseFloat(els.retValue.value))],
+    ];
+
+    const outputs = [
+      ["All Impressions Delivered (Banner/CTV)", els.o_impr.textContent],
+      ["Total Application Starts", els.o_starts.textContent],
+      ["Total Application Completion", els.o_comp.textContent],
+      ["Total Application Funded", els.o_funded.textContent],
+      ["Total Direct Revenue from Digital Advertising", els.o_rev.textContent],
+
+      ["Increased Impression Levels", els.o_incr_impr.textContent],
+      ["Monetary Value of Added Impressions", els.o_added_value.textContent],
+      ["Total Incremental Application Funded", els.o_incr_funded.textContent],
+      ["Incremental Direct Revenue", els.o_incr_rev_impr.textContent],
+
+      ["Current Site Visitors Identified", els.o_site_id.textContent],
+      ["Additional Site Visitors Identified", els.o_addl_site_id.textContent],
+      ["Additional Conversions", els.o_addl_conv.textContent],
+      ["Incremental Revenue from Increased Retargeting", els.o_incr_rev_ret.textContent],
+
+      ["Incremental Value of Added Impressions", els.o_added_value_2.textContent],
+      ["Incremental Direct Revenue", els.o_total_incr.textContent],
+    ];
+
+    return {
+      generatedAt: now.toLocaleString(),
+      notes: (els.notes.value || "").trim(),
+      shareLink: location.href,
+      inputs,
+      outputs
+    };
+  }
+
+  function openPdfReport(){
+    // Uses browser print-to-PDF for maximum compatibility (no external libs)
+    const snap = getSnapshot();
+
+    const style = `
+      <style>
+        @page { margin: 18mm; }
+        body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#111; }
+        .hdr{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+        .brand{ display:flex; align-items:center; gap:10px; }
+        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #4b78ff, #7aa2ff); }
+        h1{ font-size: 16px; margin:0; }
+        .meta{ font-size: 11px; color:#444; text-align:right; }
+        .sub{ margin: 10px 0 14px; color:#333; font-size:12px; line-height:1.35; }
+        .box{ border:1px solid #ddd; border-radius: 10px; padding: 12px; margin: 12px 0; }
+        h2{ font-size: 13px; margin: 0 0 10px; }
+        table{ width:100%; border-collapse: collapse; font-size: 12px; }
+        td{ padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+        td:first-child{ width: 64%; color:#222; }
+        td:last-child{ width: 36%; text-align:right; font-weight:600; }
+        .note{ font-size: 12px; color:#333; white-space: pre-wrap; }
+        .footer{ margin-top: 14px; font-size: 10px; color:#666; line-height:1.35; }
+        .pill{ display:inline-block; padding: 2px 8px; border:1px solid #e5e5e5; border-radius:999px; font-size:11px; color:#444; }
+        @media print{
+          .noprint{ display:none; }
+        }
+      </style>
+    `;
+
+    const rows = (arr) => arr.map(([k,v]) => `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v))}</td></tr>`).join("");
+
+    const html = `
+      <!doctype html>
+      <html>
+      <head><meta charset="utf-8">${style}<title>Semcasting Report</title></head>
+      <body>
+        <div class="hdr">
+          <div class="brand">
+            <div class="logo" aria-hidden="true"></div>
+            <div>
+              <h1>Semcasting — Incremental Media Performance (Demo Report)</h1>
+              <div class="sub" style="margin:4px 0 0; font-size:11px; color:#555;">
+                Mortgage Lenders • Same Budget / Better Performance
+              </div>
+            </div>
+          </div>
+          <div class="meta">
+            <div><span class="pill">Generated</span> ${escapeHtml(snap.generatedAt)}</div>
+          </div>
+        </div>
+
+        <div class="sub">
+          Impressions are computed as <b>(Budget ÷ CPM) × 1000</b>. Outputs mirror the Excel field labels.
+        </div>
+
+        ${snap.notes ? `
+          <div class="box">
+            <h2>Notes</h2>
+            <div class="note">${escapeHtml(snap.notes)}</div>
+          </div>
+        ` : ""}
+
+        <div class="box">
+          <h2>Inputs</h2>
+          <table>${rows(snap.inputs)}</table>
+        </div>
+
+        <div class="box">
+          <h2>Outputs</h2>
+          <table>${rows(snap.outputs)}</table>
+        </div>
+
+        <div class="footer">
+          Shareable link: ${escapeHtml(snap.shareLink)}<br/>
+          For demo/testing purposes. © ${new Date().getFullYear()} Semcasting (light branding).
+        </div>
+
+        <div class="noprint" style="margin-top:14px;">
+          <button onclick="window.print()" style="padding:10px 12px; border:1px solid #bbb; border-radius:10px; background:#fff; cursor:pointer;">
+            Print / Save as PDF
+          </button>
+        </div>
+
+        <script>
+          // Auto-open print dialog for convenience
+          setTimeout(() => window.print(), 250);
+        </script>
+      </body>
+      </html>
+    `;
+
+    const w = window.open("", "_blank", "noopener,noreferrer");
+    if (!w) return;
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
+
+  function escapeHtml(str){
+    return str
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // Wire events
+  const watchIds = [
+    "budget","cpm","ctr","startRate","completionRate","fundedRate","ltv","rounding",
+    "suppr","freqCtl","incrImpr","siteVisitors","siteIdPct","addlIdPct","retCtr","retConv","retValue","notes"
+  ];
+  ["input","change"].forEach(evt => watchIds.forEach(id => $(id).addEventListener(evt, calc)));
+
+  els.resetBtn.addEventListener("click", resetBenchmark);
+  els.copyBtn.addEventListener("click", copyShareLink);
+  els.pdfBtn.addEventListener("click", openPdfReport);
+
+  // Init
+  loadFromUrl();
+  // If URL didn’t set values, ensure benchmark defaults
+  if (!location.search) resetBenchmark();
+  calc();
+</script>
+</body>
+</html>
