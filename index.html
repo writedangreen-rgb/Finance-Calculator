@@ -35,23 +35,23 @@
     .brand h1{ font-size: 15px; margin:0; letter-spacing:.2px; }
     .brand .sub{ font-size: 12px; color: var(--muted2); margin: 2px 0 0; }
 
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-    button{
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+    button, select{
       border:1px solid var(--border2); background:#0b1220; color:var(--text);
       border-radius: 12px; padding: 10px 12px; cursor:pointer; font-size: 13px;
     }
-    button:hover{ border-color: var(--accent); }
+    select{ cursor:pointer; }
+    button:hover, select:hover{ border-color: var(--accent); }
     .primary{
       border-color: rgba(75,120,255,.65);
       background: rgba(75,120,255,.14);
     }
     .primary:hover{ border-color: var(--accent); background: rgba(75,120,255,.18); }
 
-    /* Main content cards */
     .card{ background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .titlePrompt{
       font-weight: 800;
-      font-size: 22px; /* two sizes larger than input text */
+      font-size: 22px;
       line-height: 1.2;
       margin: 0 0 14px 0;
     }
@@ -65,16 +65,13 @@
     .hint{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height:1.25; font-weight: 600; }
     .divider{ height:1px; background: rgba(34,48,77,.9); margin: 12px 0; }
 
-    /* Input wrapper to show $ and % signs */
-    .input-wrap{
-      position: relative;
-    }
+    .input-wrap{ position: relative; }
     .input-wrap .prefix, .input-wrap .suffix{
       position:absolute; top:50%; transform:translateY(-50%);
       opacity:.70; pointer-events:none; font-size: 14px; font-weight: 800;
     }
     .input-wrap .prefix{ left:10px; }
-    .input-wrap .suffix{ right:10px; } /* tight to the number on the right */
+    .input-wrap .suffix{ right:10px; }
 
     input{
       width:100%; box-sizing:border-box;
@@ -85,32 +82,19 @@
     }
     input:focus{ border-color: var(--accent); }
 
-    /* ensure room for $ and % */
     .pad-left{ padding-left: 28px !important; }
     .pad-right{ padding-right: 26px !important; }
 
-    /* ---- FIX: Percent fields visually 5 digits wide ----
-       Stop input-wrap from stretching when it contains percent inputs,
-       and override input{width:100%} for those percent inputs.
-    */
-    .input-wrap.percent-wrap{
-      display: inline-block;   /* critical: prevents full-row stretch */
-    }
+    /* Percent fields: 5 characters wide visually + capped by maxlength=5 */
+    .input-wrap.percent-wrap{ display:inline-block; }
     .input-wrap.percent-wrap input.percent{
-      width: 5ch !important;       /* 5 characters */
+      width: 5ch !important;
       min-width: 5ch !important;
       max-width: 5ch !important;
-      text-align: right;
-      box-sizing: content-box;     /* more predictable ch sizing */
-    }
-    .input-wrap.percent-wrap .suffix{
-      right: 8px; /* slightly tighter */
+      text-align:right;
+      box-sizing: content-box;
     }
 
-    /* Money fields: keep flexible */
-    input.money{ width: 100%; }
-
-    /* Big submit button */
     .ctaRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 6px; }
     .ctaBig{
       font-size: 16px;
@@ -120,7 +104,6 @@
       min-width: 260px;
     }
 
-    /* Outputs */
     .outputsTitle{ font-size: 16px; font-weight: 850; margin: 0 0 10px; color: var(--muted); }
     .kpiGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
     @media (min-width: 720px){ .kpiGrid{ grid-template-columns: 1fr 1fr; } }
@@ -143,7 +126,7 @@
       .topbar, .ctaRow, .noPrint{ display:none !important; }
       .card{ background:#fff; border:0; padding:0; margin:0; }
       .field{ border:1px solid #ddd; background:#fff; }
-      input{ background:#fff; color:#111; border:1px solid #ddd; }
+      input, select{ background:#fff; color:#111; border:1px solid #ddd; }
       .kpi{ background:#fff; border:1px solid #ddd; }
       .wrap{ max-width:none; padding:0; }
     }
@@ -160,10 +143,16 @@
           <div class="sub">Incremental Media Performance Calculator (Demo)</div>
         </div>
       </div>
+
       <div class="actions noPrint">
+        <select id="benchmarkSelect" title="Benchmark set">
+          <option value="standard">Benchmark: Standard</option>
+          <option value="conservative">Benchmark: Conservative</option>
+          <option value="aggressive">Benchmark: Aggressive</option>
+        </select>
         <button id="copyBtn" type="button">Copy shareable link</button>
         <button id="pdfBtn" class="primary" type="button">Download PDF report</button>
-        <button id="resetBtn" type="button">Reset to benchmarks</button>
+        <button id="resetBtn" type="button">Reset to benchmark</button>
       </div>
     </div>
 
@@ -180,7 +169,7 @@
             <span class="prefix">$</span>
             <input id="budget" class="money pad-left" inputmode="decimal" value="10,000,000.00" required>
           </div>
-          <div class="hint">benchmark: $10,000,000</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
 
         <div class="field">
@@ -189,7 +178,7 @@
             <span class="prefix">$</span>
             <input id="cpm" class="money pad-left" inputmode="decimal" value="15.00" required>
           </div>
-          <div class="hint">benchmark: $15.00</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
       </div>
 
@@ -200,7 +189,7 @@
             <input id="ctr" class="percent pad-right" inputmode="decimal" maxlength="5" value="0.15" required>
             <span class="suffix">%</span>
           </div>
-          <div class="hint">benchmark: 0.15%</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
 
         <div class="field">
@@ -209,7 +198,7 @@
             <input id="startRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="0.40" required>
             <span class="suffix">%</span>
           </div>
-          <div class="hint">benchmark: 0.40%</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
       </div>
 
@@ -220,7 +209,7 @@
             <input id="completionRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="40" required>
             <span class="suffix">%</span>
           </div>
-          <div class="hint">benchmark: 40%</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
 
         <div class="field">
@@ -229,7 +218,7 @@
             <input id="fundedRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="50" required>
             <span class="suffix">%</span>
           </div>
-          <div class="hint">benchmark: 50%</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
       </div>
 
@@ -237,7 +226,7 @@
         <div class="field">
           <label for="siteVisitors">Estimated Current Site Visitors (per year)</label>
           <input id="siteVisitors" inputmode="numeric" value="1,200,000" required>
-          <div class="hint">benchmark: 1,200,000</div>
+          <div class="hint">benchmark: varies by preset</div>
         </div>
 
         <div class="field">
@@ -250,14 +239,27 @@
         </div>
       </div>
 
-      <div class="divider"></div>
-
+      <!-- Incremental lift input -->
       <div class="row">
+        <div class="field">
+          <label for="liftPct">Estimated Incremental Lift from Measurement</label>
+          <div class="input-wrap percent-wrap">
+            <input id="liftPct" class="percent pad-right" inputmode="decimal" maxlength="5" value="10" required>
+            <span class="suffix">%</span>
+          </div>
+          <div class="hint">benchmark: 10% (applies to total funded volume)</div>
+        </div>
+
         <div class="field">
           <label for="notes">Notes (optional; included in PDF)</label>
           <input id="notes" type="text" placeholder="Prospect name, campaign, assumptions…">
           <div class="hint">benchmark: (optional)</div>
         </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
         <div class="field">
           <label>&nbsp;</label>
           <div class="ctaRow noPrint">
@@ -265,14 +267,16 @@
           </div>
           <div id="err" class="err"></div>
         </div>
-      </div>
 
-      <div class="foot">
-        For demo/testing purposes. Calculations are driven entirely by the inputs shown.
+        <div class="field">
+          <div class="foot">
+            For demo/testing purposes. Calculations are driven entirely by the inputs shown.
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- OUTPUTS (below inputs) -->
+    <!-- OUTPUTS -->
     <div class="card" id="outputsCard">
       <p class="outputsTitle">Outputs</p>
 
@@ -302,15 +306,27 @@
         </div>
 
         <div class="kpi">
-          <div class="k">Lifetime Value of a Funded Loan</div>
-          <div class="v" id="o_ltv">—</div>
-          <div class="m" id="o_ltv_mini">—</div>
+          <div class="k">Total Direct Revenue from Digital Advertising (Base)</div>
+          <div class="v" id="o_rev_base">—</div>
+          <div class="m" id="o_rev_base_mini">—</div>
         </div>
 
         <div class="kpi">
-          <div class="k">Total Direct Revenue from Digital Advertising</div>
-          <div class="v" id="o_rev">—</div>
-          <div class="m" id="o_rev_mini">—</div>
+          <div class="k">Total Direct Revenue from Digital Advertising (With Measurement)</div>
+          <div class="v" id="o_rev_meas">—</div>
+          <div class="m" id="o_rev_meas_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Incremental Funded Applications from Measurement</div>
+          <div class="v" id="o_inc_funded">—</div>
+          <div class="m" id="o_inc_funded_mini">—</div>
+        </div>
+
+        <div class="kpi">
+          <div class="k">Incremental Direct Revenue from Measurement</div>
+          <div class="v" id="o_inc_rev">—</div>
+          <div class="m" id="o_inc_rev_mini">—</div>
         </div>
       </div>
     </div>
@@ -320,6 +336,7 @@
   const $ = (id) => document.getElementById(id);
 
   const els = {
+    benchmarkSelect: $("benchmarkSelect"),
     budget: $("budget"),
     cpm: $("cpm"),
     ctr: $("ctr"),
@@ -328,6 +345,7 @@
     fundedRate: $("fundedRate"),
     siteVisitors: $("siteVisitors"),
     ltv: $("ltv"),
+    liftPct: $("liftPct"),
     notes: $("notes"),
 
     err: $("err"),
@@ -336,7 +354,6 @@
     copyBtn: $("copyBtn"),
     pdfBtn: $("pdfBtn"),
 
-    // outputs
     o_impr: $("o_impr"),
     o_impr_mini: $("o_impr_mini"),
     o_starts: $("o_starts"),
@@ -345,10 +362,52 @@
     o_comp_mini: $("o_comp_mini"),
     o_funded: $("o_funded"),
     o_funded_mini: $("o_funded_mini"),
-    o_ltv: $("o_ltv"),
-    o_ltv_mini: $("o_ltv_mini"),
-    o_rev: $("o_rev"),
-    o_rev_mini: $("o_rev_mini"),
+
+    o_rev_base: $("o_rev_base"),
+    o_rev_base_mini: $("o_rev_base_mini"),
+    o_rev_meas: $("o_rev_meas"),
+    o_rev_meas_mini: $("o_rev_meas_mini"),
+    o_inc_funded: $("o_inc_funded"),
+    o_inc_funded_mini: $("o_inc_funded_mini"),
+    o_inc_rev: $("o_inc_rev"),
+    o_inc_rev_mini: $("o_inc_rev_mini"),
+  };
+
+  // ---------- Benchmarks ----------
+  const BENCHMARKS = {
+    standard: {
+      budget: 10000000,
+      cpm: 15,
+      ctr: 0.15,
+      startRate: 0.40,
+      completionRate: 40,
+      fundedRate: 50,
+      siteVisitors: 1200000,
+      ltv: 9000,
+      liftPct: 10
+    },
+    conservative: {
+      budget: 5000000,
+      cpm: 18,
+      ctr: 0.10,
+      startRate: 0.30,
+      completionRate: 35,
+      fundedRate: 45,
+      siteVisitors: 800000,
+      ltv: 9000,
+      liftPct: 7.5
+    },
+    aggressive: {
+      budget: 15000000,
+      cpm: 12,
+      ctr: 0.25,
+      startRate: 0.60,
+      completionRate: 45,
+      fundedRate: 60,
+      siteVisitors: 1500000,
+      ltv: 9000,
+      liftPct: 15
+    }
   };
 
   // ---------- Formatting helpers ----------
@@ -372,7 +431,7 @@
   function setFormattedPercent(el, value){
     if (!isFinite(value)) { el.value = ""; return; }
     const v = Math.round(value * 100) / 100;
-    el.value = String(v).slice(0, 5);
+    el.value = String(v).slice(0,5);
   }
 
   function fmtMoney0(x){
@@ -389,7 +448,7 @@
     els.err.textContent = msg || "";
   }
 
-  // Enforce: percent inputs only, max 5 chars, max 2 decimals, 0-100 clamp
+  // Percent enforcement: max 5 chars, max 2 decimals, clamp 0-100
   function attachPercentRules(id){
     const el = $(id);
     el.addEventListener("input", () => {
@@ -403,7 +462,6 @@
       if (v.length > 5) v = v.slice(0,5);
       el.value = v;
     });
-
     el.addEventListener("blur", () => {
       const n = parseFloat(el.value || "0");
       const clamped = Math.min(Math.max(isFinite(n) ? n : 0, 0), 100);
@@ -435,10 +493,10 @@
     });
   }
 
-  function pctToDecFromPercentValue(percentNumber, name){
+  function pctToDec(percentNumber, name){
     if (!isFinite(percentNumber)) throw new Error(`${name} must be a number.`);
     if (percentNumber < 0 || percentNumber > 100) throw new Error(`${name} must be between 0 and 100.`);
-    return percentNumber/100.0;
+    return percentNumber / 100.0;
   }
 
   function readInputs(){
@@ -448,15 +506,10 @@
     const cpm = parseNumberFromInput(els.cpm);
     if (!isFinite(cpm) || cpm < 2) throw new Error("CPM must be a number ≥ 2.");
 
-    const ctrPct = parseNumberFromInput(els.ctr);
-    const startPct = parseNumberFromInput(els.startRate);
-    const compPct = parseNumberFromInput(els.completionRate);
-    const fundedPct = parseNumberFromInput(els.fundedRate);
-
-    const ctr = pctToDecFromPercentValue(ctrPct, "Estimated Click-Through / View-Through Rate (%)");
-    const startRate = pctToDecFromPercentValue(startPct, "Estimated Application Start Rate (%)");
-    const completionRate = pctToDecFromPercentValue(compPct, "Estimated Application Completion Rate (%)");
-    const fundedRate = pctToDecFromPercentValue(fundedPct, "Estimated Application Funded Rate (%)");
+    const ctr = pctToDec(parseNumberFromInput(els.ctr), "Estimated Click-Through / View-Through Rate (%)");
+    const startRate = pctToDec(parseNumberFromInput(els.startRate), "Estimated Application Start Rate (%)");
+    const completionRate = pctToDec(parseNumberFromInput(els.completionRate), "Estimated Application Completion Rate (%)");
+    const fundedRate = pctToDec(parseNumberFromInput(els.fundedRate), "Estimated Application Funded Rate (%)");
 
     const siteVisitors = parseNumberFromInput(els.siteVisitors);
     if (!isFinite(siteVisitors) || siteVisitors < 0) throw new Error("Site Visitors must be a number ≥ 0.");
@@ -464,7 +517,9 @@
     const ltv = parseNumberFromInput(els.ltv);
     if (!isFinite(ltv) || ltv < 0) throw new Error("Lifetime Value of a Funded Loan must be ≥ 0.");
 
-    return { budget, cpm, ctr, startRate, completionRate, fundedRate, siteVisitors, ltv };
+    const liftPct = pctToDec(parseNumberFromInput(els.liftPct), "Estimated Incremental Lift from Measurement (%)");
+
+    return { budget, cpm, ctr, startRate, completionRate, fundedRate, siteVisitors, ltv, liftPct };
   }
 
   function calc(){
@@ -472,22 +527,22 @@
       showErr("");
       const i = readInputs();
 
-      // Impressions = (Budget ÷ CPM) × 1000
+      // Base funnel
       const impressions = (i.budget / i.cpm) * 1000;
-
-      // Starts = Impressions × CTR/VTR × Start Rate
       const totalStarts = impressions * i.ctr * i.startRate;
-
-      // Completions = Starts × Completion Rate
       const totalCompletions = totalStarts * i.completionRate;
-
-      // Funded = Completions × Funded Rate
       const totalFunded = totalCompletions * i.fundedRate;
 
-      // Total Direct Revenue = Funded × LTV
-      const totalDirectRevenue = totalFunded * i.ltv;
+      const baseRevenue = totalFunded * i.ltv;
 
-      // Render
+      // Measurement lift (applied to funded volume, conservative and transparent)
+      const measFunded = totalFunded * (1 + i.liftPct);
+      const measRevenue = measFunded * i.ltv;
+
+      const incFunded = measFunded - totalFunded;
+      const incRevenue = measRevenue - baseRevenue;
+
+      // Render base funnel outputs
       els.o_impr.textContent = fmtInt(impressions);
       els.o_impr_mini.textContent = "Computed as (Budget ÷ CPM) × 1000";
 
@@ -500,11 +555,18 @@
       els.o_funded.textContent = fmtInt(totalFunded);
       els.o_funded_mini.textContent = "Total Application Completions × Application Funded Rate";
 
-      els.o_ltv.textContent = fmtMoney0(i.ltv);
-      els.o_ltv_mini.textContent = "Input: Lifetime Value of a Funded Loan";
+      // Revenue outputs
+      els.o_rev_base.textContent = fmtMoney0(baseRevenue);
+      els.o_rev_base_mini.textContent = "Total Application Funded × Lifetime Value of a Funded Loan";
 
-      els.o_rev.textContent = fmtMoney0(totalDirectRevenue);
-      els.o_rev_mini.textContent = "Total Application Funded × Lifetime Value of a Funded Loan";
+      els.o_rev_meas.textContent = fmtMoney0(measRevenue);
+      els.o_rev_meas_mini.textContent = `Applies measurement lift of ${(i.liftPct*100).toFixed(2).replace(/\.00$/,'')}% to funded volume`;
+
+      els.o_inc_funded.textContent = fmtInt(incFunded);
+      els.o_inc_funded_mini.textContent = "With Measurement Funded − Base Funded";
+
+      els.o_inc_rev.textContent = fmtMoney0(incRevenue);
+      els.o_inc_rev_mini.textContent = "With Measurement Revenue − Base Revenue";
 
       syncUrl();
       document.getElementById("outputsCard").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -535,6 +597,8 @@
       ["Estimated Application Funded Rate", escapeHtml(iv("fundedRate")) + "%"],
       ["Estimated Current Site Visitors (per year)", escapeHtml(iv("siteVisitors"))],
       ["Lifetime Value of a Funded Loan", "$" + escapeHtml(iv("ltv"))],
+      ["Estimated Incremental Lift from Measurement", escapeHtml(iv("liftPct")) + "%"],
+      ["Benchmark preset", escapeHtml(els.benchmarkSelect.value)],
     ];
 
     const outputs = [
@@ -542,8 +606,10 @@
       ["Total Application Starts", escapeHtml(els.o_starts.textContent)],
       ["Total Application Completions", escapeHtml(els.o_comp.textContent)],
       ["Total Application Funded", escapeHtml(els.o_funded.textContent)],
-      ["Lifetime Value of a Funded Loan", escapeHtml(els.o_ltv.textContent)],
-      ["Total Direct Revenue from Digital Advertising", escapeHtml(els.o_rev.textContent)],
+      ["Total Direct Revenue from Digital Advertising (Base)", escapeHtml(els.o_rev_base.textContent)],
+      ["Total Direct Revenue from Digital Advertising (With Measurement)", escapeHtml(els.o_rev_meas.textContent)],
+      ["Incremental Funded Applications from Measurement", escapeHtml(els.o_inc_funded.textContent)],
+      ["Incremental Direct Revenue from Measurement", escapeHtml(els.o_inc_rev.textContent)],
     ];
 
     return {
@@ -556,6 +622,7 @@
   }
 
   function openPdfReport(){
+    // Ensure outputs reflect current inputs
     calc();
     const snap = getSnapshot();
 
@@ -584,11 +651,12 @@
 
     const rows = (arr) => arr.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
 
+    // IMPORTANT: no <script> tags inside template strings (prevents breaking main page JS)
     const html = `
       <!doctype html>
       <html>
       <head><meta charset="utf-8">${style}<title>Semcasting Report</title></head>
-      <body>
+      <body onload="setTimeout(()=>window.print(),250)">
         <div class="hdr">
           <div class="brand">
             <div class="logo" aria-hidden="true"></div>
@@ -605,7 +673,7 @@
         </div>
 
         <div class="sub">
-          Impressions are computed as <b>(Budget ÷ CPM) × 1000</b>.
+          Impressions are computed as <b>(Budget ÷ CPM) × 1000</b>. Measurement impact is modeled as an <b>incremental lift applied to funded volume</b>.
         </div>
 
         ${snap.notes ? `
@@ -635,9 +703,6 @@
             Print / Save as PDF
           </button>
         </div>
-
-    <script>setTimeout(() => window.print(), 250);<\/script>
-
       </body>
       </html>
     `;
@@ -655,6 +720,7 @@
       return isFinite(v) ? String(v) : "";
     };
     const params = new URLSearchParams({
+      preset: els.benchmarkSelect.value,
       b: num("budget"),
       cpm: num("cpm"),
       ctr: num("ctr"),
@@ -663,6 +729,7 @@
       fr: num("fundedRate"),
       sv: num("siteVisitors"),
       ltv: num("ltv"),
+      lift: num("liftPct"),
       n: els.notes.value || ""
     });
     history.replaceState(null, "", `${location.origin}${location.pathname}?${params.toString()}`);
@@ -671,6 +738,10 @@
   function loadFromUrl(){
     const p = new URLSearchParams(location.search);
     if (!p.toString()) return;
+
+    if (p.has("preset") && BENCHMARKS[p.get("preset")]) {
+      els.benchmarkSelect.value = p.get("preset");
+    }
 
     const setNum = (key, elId, formatFn) => {
       if (!p.has(key)) return;
@@ -687,6 +758,7 @@
     setNum("sr","startRate", setFormattedPercent);
     setNum("cr","completionRate", setFormattedPercent);
     setNum("fr","fundedRate", setFormattedPercent);
+    setNum("lift","liftPct", setFormattedPercent);
 
     setNum("sv","siteVisitors", setFormattedInteger);
 
@@ -703,51 +775,57 @@
     });
   }
 
-  function resetBenchmarks(){
-    setFormattedCurrency(els.budget, 10000000);
-    setFormattedCurrency(els.cpm, 15);
-    setFormattedPercent(els.ctr, 0.15);
-    setFormattedPercent(els.startRate, 0.40);
-    setFormattedPercent(els.completionRate, 40);
-    setFormattedPercent(els.fundedRate, 50);
-    setFormattedInteger(els.siteVisitors, 1200000);
-    setFormattedCurrency(els.ltv, 9000);
-    els.notes.value = "";
+  function clearOutputs(){
+    [
+      "o_impr","o_starts","o_comp","o_funded",
+      "o_rev_base","o_rev_meas","o_inc_funded","o_inc_rev",
+      "o_impr_mini","o_starts_mini","o_comp_mini","o_funded_mini",
+      "o_rev_base_mini","o_rev_meas_mini","o_inc_funded_mini","o_inc_rev_mini"
+    ].forEach(id => { if ($(id)) $(id).textContent = "—"; });
+  }
+
+  function applyPreset(presetKey){
+    const b = BENCHMARKS[presetKey] || BENCHMARKS.standard;
+    setFormattedCurrency(els.budget, b.budget);
+    setFormattedCurrency(els.cpm, b.cpm);
+    setFormattedPercent(els.ctr, b.ctr);
+    setFormattedPercent(els.startRate, b.startRate);
+    setFormattedPercent(els.completionRate, b.completionRate);
+    setFormattedPercent(els.fundedRate, b.fundedRate);
+    setFormattedInteger(els.siteVisitors, b.siteVisitors);
+    setFormattedCurrency(els.ltv, b.ltv);
+    setFormattedPercent(els.liftPct, b.liftPct);
+    els.notes.value = els.notes.value || "";
     showErr("");
-    // Clear outputs until Calculate is clicked
-    els.o_impr.textContent = "—";
-    els.o_starts.textContent = "—";
-    els.o_comp.textContent = "—";
-    els.o_funded.textContent = "—";
-    els.o_ltv.textContent = "—";
-    els.o_rev.textContent = "—";
-    els.o_impr_mini.textContent = "—";
-    els.o_starts_mini.textContent = "—";
-    els.o_comp_mini.textContent = "—";
-    els.o_funded_mini.textContent = "—";
-    els.o_ltv_mini.textContent = "—";
-    els.o_rev_mini.textContent = "—";
+    clearOutputs();
     syncUrl();
   }
 
   // Wire formatting behaviors
-  wireCurrency("budget", 10000000);
-  wireCurrency("cpm", 15);
-  wireCurrency("ltv", 9000);
-  wireInteger("siteVisitors", 1200000);
+  wireCurrency("budget", BENCHMARKS.standard.budget);
+  wireCurrency("cpm", BENCHMARKS.standard.cpm);
+  wireCurrency("ltv", BENCHMARKS.standard.ltv);
+  wireInteger("siteVisitors", BENCHMARKS.standard.siteVisitors);
 
-  // Percent rules (visual width enforced via CSS + maxlength=5 + JS cap)
-  ["ctr","startRate","completionRate","fundedRate"].forEach(attachPercentRules);
+  ["ctr","startRate","completionRate","fundedRate","liftPct"].forEach(attachPercentRules);
 
-  // Init formatting + URL load
+  // Init
   loadFromUrl();
-  if (!location.search) resetBenchmarks();
+  // If no query params, apply standard preset
+  if (!location.search) {
+    els.benchmarkSelect.value = "standard";
+    applyPreset("standard");
+  } else {
+    // Keep current values, but ensure URL includes preset
+    if (!new URLSearchParams(location.search).has("preset")) syncUrl();
+  }
 
-  // Buttons
+  // Buttons / controls
   els.calcBtn.addEventListener("click", calc);
-  els.resetBtn.addEventListener("click", resetBenchmarks);
+  els.resetBtn.addEventListener("click", () => applyPreset(els.benchmarkSelect.value));
   els.copyBtn.addEventListener("click", copyShareLink);
   els.pdfBtn.addEventListener("click", openPdfReport);
+  els.benchmarkSelect.addEventListener("change", () => applyPreset(els.benchmarkSelect.value));
 </script>
 </body>
 </html>
