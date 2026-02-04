@@ -48,6 +48,12 @@
     }
     .primary:hover{ border-color: var(--accent); background: rgba(75,120,255,.18); }
 
+    /* Mobile/topbar niceties */
+    @media (max-width: 720px){
+      .actions{ justify-content:flex-start; }
+      .actions button, .actions select{ width:100%; }
+    }
+
     .card{ background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 14px; }
     .titlePrompt{
       font-weight: 800;
@@ -56,8 +62,13 @@
       margin: 0 0 14px 0;
     }
 
-    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
-    @media (min-width: 720px){ .row{ grid-template-columns: 1fr 1fr; } }
+    /* ✅ Inputs: ALWAYS one column (reduces clutter) */
+    .row{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
 
     .field{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 10px; }
     label{ display:block; font-size: 14px; color: var(--muted); margin-bottom: 6px; font-weight: 650; }
@@ -104,7 +115,9 @@
       min-width: 260px;
     }
 
-    .sTitle{ font-size: 16px; font-weight: 850; margin: 0 0 10px; color: var(--muted); }
+    .outputsTitle{ font-size: 16px; font-weight: 850; margin: 0 0 10px; color: var(--muted); }
+
+    /* Outputs: keep 2 columns on desktop */
     .kpiGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
     @media (min-width: 720px){ .kpiGrid{ grid-template-columns: 1fr 1fr; } }
 
@@ -159,7 +172,7 @@
     <!-- INPUTS -->
     <div class="card" id="inputsCard">
       <p class="titlePrompt">
-     <b> <center>Drive Additional Mortgage Applications Through Media Measurement</center> </BR> </BR> Enter Key Metrics to Calculate the Incremental Impact for You</b>
+        Please enter some basic business metrics to determine the impact of measurement for your financial organization.
       </p>
 
       <div class="row">
@@ -171,7 +184,9 @@
           </div>
           <div class="hint">benchmark: varies by preset</div>
         </div>
+      </div>
 
+      <div class="row">
         <div class="field">
           <label for="cpm">Estimated Blended CPM</label>
           <div class="input-wrap">
@@ -191,7 +206,9 @@
           </div>
           <div class="hint">benchmark: varies by preset</div>
         </div>
+      </div>
 
+      <div class="row">
         <div class="field">
           <label for="startRate">Estimated Application Start Rate</label>
           <div class="input-wrap percent-wrap">
@@ -211,7 +228,9 @@
           </div>
           <div class="hint">benchmark: varies by preset</div>
         </div>
+      </div>
 
+      <div class="row">
         <div class="field">
           <label for="fundedRate">Estimated Application Funded Rate</label>
           <div class="input-wrap percent-wrap">
@@ -228,7 +247,9 @@
           <input id="siteVisitors" inputmode="numeric" value="1,200,000" required>
           <div class="hint">benchmark: varies by preset</div>
         </div>
+      </div>
 
+      <div class="row">
         <div class="field">
           <label for="ltv">Lifetime Value of a Funded Loan</label>
           <div class="input-wrap">
@@ -239,7 +260,6 @@
         </div>
       </div>
 
-      <!-- Incremental lift input -->
       <div class="row">
         <div class="field">
           <label for="liftPct">Estimated Incremental Lift from Measurement</label>
@@ -249,7 +269,9 @@
           </div>
           <div class="hint">benchmark: 10% (applies to total funded volume)</div>
         </div>
+      </div>
 
+      <div class="row">
         <div class="field">
           <label for="notes">Notes (optional; included in PDF)</label>
           <input id="notes" type="text" placeholder="Prospect name, campaign, assumptions…">
@@ -261,14 +283,10 @@
 
       <div class="row">
         <div class="field">
-          <label>&nbsp;</label>
           <div class="ctaRow noPrint">
             <button id="calcBtn" class="primary ctaBig" type="button">Calculate</button>
           </div>
           <div id="err" class="err"></div>
-        </div>
-
-        <div class="field">
           <div class="foot">
             For demo/testing purposes. Calculations are driven entirely by the inputs shown.
           </div>
@@ -373,7 +391,7 @@
     o_inc_rev_mini: $("o_inc_rev_mini"),
   };
 
-  // ---------- Benchmarks ----------
+  // Benchmarks
   const BENCHMARKS = {
     standard: {
       budget: 10000000,
@@ -410,10 +428,8 @@
     }
   };
 
-  // ---------- Formatting helpers ----------
-  function stripNonNumeric(s){
-    return (s || "").toString().replace(/[^0-9.]/g, "");
-  }
+  // Helpers
+  function stripNonNumeric(s){ return (s || "").toString().replace(/[^0-9.]/g, ""); }
   function parseNumberFromInput(el){
     const raw = stripNonNumeric(el.value).replace(/(\..*)\./g, "$1");
     const n = parseFloat(raw);
@@ -448,7 +464,7 @@
     els.err.textContent = msg || "";
   }
 
-  // Percent enforcement: max 5 chars, max 2 decimals, clamp 0-100
+  // Percent rules
   function attachPercentRules(id){
     const el = $(id);
     el.addEventListener("input", () => {
@@ -535,14 +551,14 @@
 
       const baseRevenue = totalFunded * i.ltv;
 
-      // Measurement lift (applied to funded volume, conservative and transparent)
+      // Lift applied to funded volume
       const measFunded = totalFunded * (1 + i.liftPct);
       const measRevenue = measFunded * i.ltv;
 
       const incFunded = measFunded - totalFunded;
       const incRevenue = measRevenue - baseRevenue;
 
-      // Render base funnel outputs
+      // Render
       els.o_impr.textContent = fmtInt(impressions);
       els.o_impr_mini.textContent = "Computed as (Budget ÷ CPM) × 1000";
 
@@ -555,7 +571,6 @@
       els.o_funded.textContent = fmtInt(totalFunded);
       els.o_funded_mini.textContent = "Total Application Completions × Application Funded Rate";
 
-      // Revenue outputs
       els.o_rev_base.textContent = fmtMoney0(baseRevenue);
       els.o_rev_base_mini.textContent = "Total Application Funded × Lifetime Value of a Funded Loan";
 
@@ -622,7 +637,6 @@
   }
 
   function openPdfReport(){
-    // Ensure outputs reflect current inputs
     calc();
     const snap = getSnapshot();
 
@@ -651,7 +665,6 @@
 
     const rows = (arr) => arr.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
 
-    // IMPORTANT: no <script> tags inside template strings (prevents breaking main page JS)
     const html = `
       <!doctype html>
       <html>
@@ -666,7 +679,7 @@
                 Financial Organization Planning Outputs
               </div>
             </div>
-          </div> 
+          </div>
           <div class="meta">
             <div><span class="pill">Generated</span> ${escapeHtml(snap.generatedAt)}</div>
           </div>
@@ -689,7 +702,7 @@
         </div>
 
         <div class="box">
-          <h1>Current Results Without Real Measurement Technology</h1>
+          <h2>Outputs</h2>
           <table>${rows(snap.outputs)}</table>
         </div>
 
@@ -795,7 +808,6 @@
     setFormattedInteger(els.siteVisitors, b.siteVisitors);
     setFormattedCurrency(els.ltv, b.ltv);
     setFormattedPercent(els.liftPct, b.liftPct);
-    els.notes.value = els.notes.value || "";
     showErr("");
     clearOutputs();
     syncUrl();
@@ -811,12 +823,10 @@
 
   // Init
   loadFromUrl();
-  // If no query params, apply standard preset
   if (!location.search) {
     els.benchmarkSelect.value = "standard";
     applyPreset("standard");
   } else {
-    // Keep current values, but ensure URL includes preset
     if (!new URLSearchParams(location.search).has("preset")) syncUrl();
   }
 
