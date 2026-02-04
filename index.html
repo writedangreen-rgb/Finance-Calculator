@@ -119,7 +119,14 @@
 
     /* Outputs: keep 2 columns on desktop */
     .kpiGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
-    @media (min-width: 720px){ .kpiGrid{ grid-template-columns: 1fr 1fr; } }
+   .row{
+  display:grid;
+  grid-template-columns: 1fr;  /* always one column */
+  gap: 10px;
+  margin-bottom: 12px;
+}
+/* REMOVE the @media rule that makes .row two columns */
+
 
     .kpi{
       background: var(--card2);
