@@ -6,15 +6,16 @@
   <title>Semcasting | Incremental Media Performance Calculator (Demo)</title>
   <style>
     :root{
-      --bg:#0b0f17;
-      --card:#121a2a;
-      --card2:#0f1626;
-      --border:#22304d;
-      --border2:#2a3a5e;
-      --text:#e8eefc;
-      --muted:rgba(232,238,252,.78);
-      --muted2:rgba(232,238,252,.65);
-      --accent:#4b78ff;
+      /* ✅ Light theme (white background, black text) */
+      --bg:#ffffff;
+      --card:#ffffff;
+      --card2:#ffffff;
+      --border:#d6dbe6;
+      --border2:#c7cfde;
+      --text:#111111;
+      --muted:rgba(17,17,17,.78);
+      --muted2:rgba(17,17,17,.60);
+      --accent:#2f5bff;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
     body{ margin:0; background:var(--bg); color:var(--text); }
@@ -23,30 +24,29 @@
     .topbar{
       display:flex; align-items:center; justify-content:space-between;
       gap:12px; padding: 10px 12px; border: 1px solid var(--border);
-      background: rgba(18,26,42,.75); border-radius: 14px;
-      backdrop-filter: blur(6px);
+      background: #fff; border-radius: 14px;
     }
     .brand{ display:flex; align-items:center; gap:10px; }
     .logo{
       width:34px; height:34px; border-radius:10px;
       background: linear-gradient(135deg, var(--accent), #7aa2ff);
-      box-shadow: 0 10px 24px rgba(75,120,255,.25);
+      box-shadow: 0 10px 24px rgba(47,91,255,.18);
     }
     .brand h1{ font-size: 15px; margin:0; letter-spacing:.2px; }
     .brand .sub{ font-size: 12px; color: var(--muted2); margin: 2px 0 0; }
 
     .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
     button, select{
-      border:1px solid var(--border2); background:#0b1220; color:var(--text);
+      border:1px solid var(--border2); background:#fff; color:var(--text);
       border-radius: 12px; padding: 10px 12px; cursor:pointer; font-size: 13px;
     }
     select{ cursor:pointer; }
     button:hover, select:hover{ border-color: var(--accent); }
     .primary{
-      border-color: rgba(75,120,255,.65);
-      background: rgba(75,120,255,.14);
+      border-color: rgba(47,91,255,.55);
+      background: rgba(47,91,255,.10);
     }
-    .primary:hover{ border-color: var(--accent); background: rgba(75,120,255,.18); }
+    .primary:hover{ border-color: var(--accent); background: rgba(47,91,255,.14); }
 
     /* Mobile/topbar niceties */
     @media (max-width: 720px){
@@ -62,7 +62,7 @@
       margin: 0 0 14px 0;
     }
 
-    /* ✅ Inputs: ALWAYS one column (reduces clutter) */
+    /* Inputs: one column */
     .row{
       display:grid;
       grid-template-columns: 1fr;
@@ -74,12 +74,12 @@
     label{ display:block; font-size: 14px; color: var(--muted); margin-bottom: 6px; font-weight: 650; }
 
     .hint{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height:1.25; font-weight: 600; }
-    .divider{ height:1px; background: rgba(34,48,77,.9); margin: 12px 0; }
+    .divider{ height:1px; background: rgba(0,0,0,.10); margin: 12px 0; }
 
     .input-wrap{ position: relative; }
     .input-wrap .prefix, .input-wrap .suffix{
       position:absolute; top:50%; transform:translateY(-50%);
-      opacity:.70; pointer-events:none; font-size: 14px; font-weight: 800;
+      opacity:.80; pointer-events:none; font-size: 14px; font-weight: 800; color:var(--text);
     }
     .input-wrap .prefix{ left:10px; }
     .input-wrap .suffix{ right:10px; }
@@ -88,12 +88,13 @@
       width:100%; box-sizing:border-box;
       padding: 10px 10px; border-radius: 10px;
       border: 1px solid var(--border2);
-      background: #0b1220; color: var(--text);
+      background: #fff; color: var(--text);
       font-size: 14px; outline: none;
     }
     input:focus{ border-color: var(--accent); }
 
-    .pad-left{ padding-left: 28px !important; }
+    /* ✅ tighter spacing between $ and number */
+    .pad-left{ padding-left: 20px !important; }
     .pad-right{ padding-right: 26px !important; }
 
     /* Percent fields: 5 characters wide visually + capped by maxlength=5 */
@@ -104,6 +105,12 @@
       max-width: 5ch !important;
       text-align:right;
       box-sizing: content-box;
+    }
+
+    /* ✅ CPM field: cap visually (still readable) */
+    input.cpm4{
+      max-width: 8ch;
+      text-align:right;
     }
 
     .ctaRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 6px; }
@@ -119,17 +126,10 @@
 
     /* Outputs: keep 2 columns on desktop */
     .kpiGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
-   .row{
-  display:grid;
-  grid-template-columns: 1fr;  /* always one column */
-  gap: 10px;
-  margin-bottom: 12px;
-}
-/* REMOVE the @media rule that makes .row two columns */
-
+    @media (min-width: 720px){ .kpiGrid{ grid-template-columns: 1fr 1fr; } }
 
     .kpi{
-      background: var(--card2);
+      background: #fff;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
@@ -138,7 +138,7 @@
     .kpi .v{ font-size: 20px; margin-top: 6px; font-weight: 900; }
     .kpi .m{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height: 1.25; }
 
-    .err{ color:#ffb4b4; font-size: 12px; margin-top: 10px; display:none; font-weight: 700; }
+    .err{ color:#b00020; font-size: 12px; margin-top: 10px; display:none; font-weight: 700; }
     .foot{ margin-top: 14px; font-size: 11px; color: var(--muted2); line-height: 1.35; }
 
     @media print{
@@ -179,7 +179,8 @@
     <!-- INPUTS -->
     <div class="card" id="inputsCard">
       <p class="titlePrompt">
-        See How Measurement Can Create Incremental Mortgage Applications <BR>Enter Your Current Metrics</BR> 
+        See How Measurement Can Create Incremental Mortgage Applications <br>
+        Enter Your Current Metrics
       </p>
 
       <div class="row">
@@ -187,7 +188,8 @@
           <label for="budget">Estimated Display and CTV Digital Marketing Budget</label>
           <div class="input-wrap">
             <span class="prefix">$</span>
-            <input id="budget" class="money pad-left" inputmode="decimal" value="10,000,000.00" required>
+            <!-- ✅ budget: no decimals -->
+            <input id="budget" class="money pad-left" inputmode="numeric" value="10,000,000" required>
           </div>
           <div class="hint">benchmark: varies by preset</div>
         </div>
@@ -198,7 +200,8 @@
           <label for="cpm">Estimated Blended CPM</label>
           <div class="input-wrap">
             <span class="prefix">$</span>
-            <input id="cpm" class="money pad-left" inputmode="decimal" value="15.00" required>
+            <!-- ✅ CPM: maxlength=4 + class for styling -->
+            <input id="cpm" class="money cpm4 pad-left" inputmode="decimal" maxlength="4" value="15.0" required>
           </div>
           <div class="hint">benchmark: varies by preset</div>
         </div>
@@ -443,9 +446,11 @@
     return isFinite(n) ? n : NaN;
   }
 
-  function setFormattedCurrency(el, value){
+  // Currency formatting with selectable decimals
+  function setFormattedCurrency(el, value, decimals){
     if (!isFinite(value)) { el.value = ""; return; }
-    el.value = value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const d = (typeof decimals === "number") ? decimals : 2;
+    el.value = value.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
   }
   function setFormattedInteger(el, value){
     if (!isFinite(value)) { el.value = ""; return; }
@@ -492,7 +497,29 @@
     });
   }
 
-  function wireCurrency(id, defaultValue){
+  // ✅ CPM rule: max 4 characters
+  function attachCpmRules(id){
+    const el = $(id);
+    el.addEventListener("input", () => {
+      let v = el.value.replace(/[^0-9.]/g,'');
+      const parts = v.split('.');
+      if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+      if (v.includes('.')) {
+        const [a,b] = v.split('.');
+        v = a + '.' + (b ?? '').slice(0,2);
+      }
+      if (v.length > 4) v = v.slice(0,4);
+      el.value = v;
+    });
+    el.addEventListener("blur", () => {
+      const n = parseFloat(el.value || "");
+      if (!isFinite(n)) { el.value = ""; return; }
+      // Keep it compact; do NOT add extra zeros, but keep within 4 chars
+      el.value = String(n).slice(0,4);
+    });
+  }
+
+  function wireCurrency(id, defaultValue, decimals){
     const el = $(id);
     el.addEventListener("focus", () => {
       const n = parseNumberFromInput(el);
@@ -500,7 +527,8 @@
     });
     el.addEventListener("blur", () => {
       const n = parseNumberFromInput(el);
-      setFormattedCurrency(el, isFinite(n) ? n : defaultValue);
+      const v = isFinite(n) ? n : defaultValue;
+      setFormattedCurrency(el, v, decimals);
     });
   }
 
@@ -550,7 +578,6 @@
       showErr("");
       const i = readInputs();
 
-      // Base funnel
       const impressions = (i.budget / i.cpm) * 1000;
       const totalStarts = impressions * i.ctr * i.startRate;
       const totalCompletions = totalStarts * i.completionRate;
@@ -558,14 +585,12 @@
 
       const baseRevenue = totalFunded * i.ltv;
 
-      // Lift applied to funded volume
       const measFunded = totalFunded * (1 + i.liftPct);
       const measRevenue = measFunded * i.ltv;
 
       const incFunded = measFunded - totalFunded;
       const incRevenue = measRevenue - baseRevenue;
 
-      // Render
       els.o_impr.textContent = fmtInt(impressions);
       els.o_impr_mini.textContent = "Computed as (Budget ÷ CPM) × 1000";
 
@@ -653,7 +678,7 @@
         body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#111; }
         .hdr{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
         .brand{ display:flex; align-items:center; gap:10px; }
-        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #4b78ff, #7aa2ff); }
+        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #2f5bff, #7aa2ff); }
         h1{ font-size: 16px; margin:0; }
         .meta{ font-size: 11px; color:#444; text-align:right; }
         .sub{ margin: 10px 0 14px; color:#333; font-size:12px; line-height:1.35; }
@@ -770,9 +795,14 @@
       formatFn($(elId), n);
     };
 
-    setNum("b","budget", setFormattedCurrency);
-    setNum("cpm","cpm", setFormattedCurrency);
-    setNum("ltv","ltv", setFormattedCurrency);
+    // ✅ budget: format with 0 decimals
+    if (p.has("b")) {
+      const n = parseFloat(p.get("b"));
+      if (isFinite(n)) setFormattedCurrency(els.budget, n, 0);
+    }
+    // CPM/ltv keep 2 decimals
+    setNum("cpm","cpm", (el, n) => setFormattedCurrency(el, n, 2));
+    setNum("ltv","ltv", (el, n) => setFormattedCurrency(el, n, 2));
 
     setNum("ctr","ctr", setFormattedPercent);
     setNum("sr","startRate", setFormattedPercent);
@@ -806,27 +836,35 @@
 
   function applyPreset(presetKey){
     const b = BENCHMARKS[presetKey] || BENCHMARKS.standard;
-    setFormattedCurrency(els.budget, b.budget);
-    setFormattedCurrency(els.cpm, b.cpm);
+
+    // ✅ budget: 0 decimals
+    setFormattedCurrency(els.budget, b.budget, 0);
+    // CPM/ltv: 2 decimals
+    setFormattedCurrency(els.cpm, b.cpm, 2);
     setFormattedPercent(els.ctr, b.ctr);
     setFormattedPercent(els.startRate, b.startRate);
     setFormattedPercent(els.completionRate, b.completionRate);
     setFormattedPercent(els.fundedRate, b.fundedRate);
     setFormattedInteger(els.siteVisitors, b.siteVisitors);
-    setFormattedCurrency(els.ltv, b.ltv);
+    setFormattedCurrency(els.ltv, b.ltv, 2);
     setFormattedPercent(els.liftPct, b.liftPct);
+
     showErr("");
     clearOutputs();
     syncUrl();
   }
 
   // Wire formatting behaviors
-  wireCurrency("budget", BENCHMARKS.standard.budget);
-  wireCurrency("cpm", BENCHMARKS.standard.cpm);
-  wireCurrency("ltv", BENCHMARKS.standard.ltv);
+  // ✅ budget: no decimals
+  wireCurrency("budget", BENCHMARKS.standard.budget, 0);
+  // CPM/ltv: 2 decimals
+  wireCurrency("cpm", BENCHMARKS.standard.cpm, 2);
+  wireCurrency("ltv", BENCHMARKS.standard.ltv, 2);
+
   wireInteger("siteVisitors", BENCHMARKS.standard.siteVisitors);
 
   ["ctr","startRate","completionRate","fundedRate","liftPct"].forEach(attachPercentRules);
+  attachCpmRules("cpm");
 
   // Init
   loadFromUrl();
