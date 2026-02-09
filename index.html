@@ -1397,13 +1397,6 @@
     o_funded_mini: $("o_funded_mini"),
     o_rev_base: $("o_rev_base"),
     o_rev_base_mini: $("o_rev_base_mini"),
-    o_rev_meas: $("o_rev_meas"),
-    o_rev_meas_mini: $("o_rev_meas_mini"),
-    o_inc_funded: $("o_inc_funded"),
-    o_inc_funded_mini: $("o_inc_funded_mini"),
-    o_inc_rev: $("o_inc_rev"),
-    o_inc_rev_mini: $("o_inc_rev_mini"),
-    o_funded_meas: $("o_funded_meas"),
     
     // New outputs for Page 6
     o_increased_impr: $("o_increased_impr"),
@@ -1696,23 +1689,6 @@
 
       els.o_total_impr_value.textContent = fmtMoney0(monetaryValueOfImpressions);
       els.o_total_inc_rev.textContent = fmtMoney0(totalIncrementalRevenue);
-
-      // Legacy outputs (kept for compatibility)
-      const measFunded = totalFunded * (1 + i.liftPct);
-      const measRevenue = measFunded * i.ltv;
-      const incFunded = measFunded - totalFunded;
-      const incRevenue = measRevenue - baseRevenue;
-
-      els.o_rev_meas.textContent = fmtMoney0(measRevenue);
-      els.o_rev_meas_mini.textContent = "Total revenue with measurement";
-
-      els.o_inc_funded.textContent = fmtInt(incFunded);
-      els.o_inc_funded_mini.textContent = "Additional loans from measurement";
-
-      els.o_inc_rev.textContent = fmtMoney0(incRevenue);
-      els.o_inc_rev_mini.textContent = "Additional revenue from measurement";
-
-      els.o_funded_meas.textContent = fmtInt(measFunded);
 
     } catch(e){
       showErr(e.message || "Please check your inputs.");
