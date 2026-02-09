@@ -242,6 +242,98 @@
       font-weight: 600;
     }
 
+    /* Benchmark range visualization */
+    .benchmark-range{
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--info-bg);
+      border-radius: 8px;
+      border: 1px solid var(--info-border);
+    }
+    .benchmark-label{
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .benchmark-track{
+      position: relative;
+      height: 32px;
+      background: linear-gradient(90deg, #fef3c7 0%, #bfdbfe 50%, #d1fae5 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      border: 1px solid #e5e7eb;
+    }
+    .benchmark-markers{
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 8px;
+    }
+    .benchmark-marker{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      flex: 1;
+    }
+    .benchmark-marker:nth-child(2){
+      align-items: center;
+    }
+    .benchmark-marker:nth-child(3){
+      align-items: flex-end;
+    }
+    .benchmark-dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #6b7280;
+      margin-bottom: 4px;
+    }
+    .benchmark-marker:nth-child(2) .benchmark-dot{
+      width: 12px;
+      height: 12px;
+      border-color: var(--accent);
+      border-width: 3px;
+      box-shadow: 0 0 0 3px rgba(47,91,255,.2);
+    }
+    .benchmark-value{
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text);
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      border: 1px solid #e5e7eb;
+    }
+    .benchmark-marker:nth-child(2) .benchmark-value{
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .benchmark-type{
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted2);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .benchmark-marker:nth-child(2) .benchmark-type{
+      color: var(--accent);
+    }
+
     /* Right panel - info/text */
     .info-panel{
       position: sticky;
@@ -426,12 +518,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <select id="benchmarkSelect" title="Benchmark preset">
-          <option value="standard">Standard Benchmark</option>
-          <option value="conservative">Conservative Benchmark</option>
-          <option value="aggressive">Aggressive Benchmark</option>
-        </select>
-        <button id="resetBtn" type="button">Reset</button>
+        <button id="resetBtn" type="button">Reset to Standard</button>
       </div>
     </div>
   </div>
@@ -462,7 +549,12 @@
         <div class="step-connector"></div>
         <div class="step" data-step="5">
           <div class="step-circle">5</div>
-          <div class="step-label">Results</div>
+          <div class="step-label">Current Results</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" data-step="6">
+          <div class="step-circle">6</div>
+          <div class="step-label">With Measurement</div>
         </div>
       </div>
       <div class="progress-bar-wrap">
@@ -496,6 +588,93 @@
               <input id="cpm" class="money pad-left" inputmode="decimal" value="15.00" required>
             </div>
             <div class="hint">Average cost to reach 1,000 impressions across all channels</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">$18</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">$15</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">$12</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="suppressionPct">Customer Suppression Rate</label>
+            <div class="input-wrap">
+              <input id="suppressionPct" class="pad-right" inputmode="decimal" value="10.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">If you're not currently suppressing your customers against media that you're running this is the % increase in impressions in doing so. These added impressions will be delivered to prospects and not already converted customers. If you're already suppressing, you're likely using cookies and not real IDs. In this case, 5% is a reasonable standard number for incremental impressions.</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">5%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">10%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">15%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="frequencyPct">Impression Frequency Control</label>
+            <div class="input-wrap">
+              <input id="frequencyPct" class="pad-right" inputmode="decimal" value="10.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Percentage of impressions optimized by controlling over/under exposure</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">5%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">10%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">15%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="nav-buttons">
@@ -539,13 +718,164 @@
               <input id="ctr" class="pad-right" inputmode="decimal" value="0.15" required>
               <span class="suffix">%</span>
             </div>
-            <div class="hint">Percentage of impressions that result in clicks or engaged views</div>
+            <div class="hint">Percentage of impressions that result in clicks or view through site visits</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.10%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.15%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.25%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="field-group">
             <label for="siteVisitors">Current Site Visitors (Annual)</label>
             <input id="siteVisitors" inputmode="numeric" value="1,200,000" required>
-            <div class="hint">Total number of unique visitors to your site per year</div>
+            <div class="hint">Total number of estimated visitors to your site per year</div>
+          </div>
+
+          <div class="field-group">
+            <label for="visitorIdPct">Current % of Site Visitors Identified</label>
+            <div class="input-wrap">
+              <input id="visitorIdPct" class="pad-right" inputmode="decimal" value="45.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Percentage of site visitors you can currently identify. These are typically logged in (authenticated) users.</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">40%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">45%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">50%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="additionalIdPct">Additional Visitors Identified using Semcasting's Cookie-less ID Technology</label>
+            <div class="input-wrap">
+              <input id="additionalIdPct" class="pad-right" inputmode="decimal" value="35.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Additional percentage identified through identity technology</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">33%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">35%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">38%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="retargetCtr">Incremental Site Visitors CTR/VTR for Retargeting</label>
+            <div class="input-wrap">
+              <input id="retargetCtr" class="pad-right" inputmode="decimal" value="0.70" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Click-through rate for retargeting identified visitors</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.60%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.70%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.80%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="retargetConversion">Retargeting Conversion Rate</label>
+            <div class="input-wrap">
+              <input id="retargetConversion" class="pad-right" inputmode="decimal" value="0.75" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Conversion rate for retargeted visitors. Generally retargeted audiences have higher click-through/view through rates.</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.60%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.75%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.85%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="nav-buttons">
@@ -590,6 +920,29 @@
               <span class="suffix">%</span>
             </div>
             <div class="hint">Percentage of visitors who begin the application process</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.30%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.40%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">0.60%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="field-group">
@@ -599,6 +952,29 @@
               <span class="suffix">%</span>
             </div>
             <div class="hint">Percentage of started applications that are completed</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">35%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">40%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">45%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="field-group">
@@ -608,6 +984,29 @@
               <span class="suffix">%</span>
             </div>
             <div class="hint">Percentage of completed applications that get funded</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">45%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">50%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">60%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="nav-buttons">
@@ -619,7 +1018,7 @@
         <div class="info-panel">
           <h3 class="info-title">Optimizing Your Funnel</h3>
           <div class="info-content">
-            <p>Your conversion funnel shows where prospects drop off between awareness and closing. Each stage represents a critical decision point.</p>
+            <p>You know your metrics best. These are your numbers but we've provided some industry benchmark numbers for you to compare against. Your conversion funnel shows where prospects drop off between awareness and closing. Each stage represents a critical decision point.</p>
             
             <p><strong>Application Start Rate:</strong> The bridge between browsing and serious intent. Higher rates indicate strong value proposition and clear calls-to-action.</p>
             
@@ -658,7 +1057,30 @@
               <span class="prefix">$</span>
               <input id="ltv" class="money pad-left" inputmode="decimal" value="9,000.00" required>
             </div>
-            <div class="hint">Total revenue generated from each successfully funded mortgage</div>
+            <div class="hint">Total revenue generated from each successfully funded mortgage. This is typically the present value of the interest, points and all fees associated with the loan and factors in the average period of time the loan is held until it is paid off.</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">$9,000</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">$9,000</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">$9,000</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="field-group">
@@ -668,6 +1090,29 @@
               <span class="suffix">%</span>
             </div>
             <div class="hint">Expected improvement in conversions through better measurement</div>
+            
+            <div class="benchmark-range">
+              <div class="benchmark-label">Industry Benchmarks</div>
+              <div class="benchmark-track">
+                <div class="benchmark-markers">
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">7.5%</div>
+                    <div class="benchmark-type">Conservative</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">10%</div>
+                    <div class="benchmark-type">Standard</div>
+                  </div>
+                  <div class="benchmark-marker">
+                    <div class="benchmark-dot"></div>
+                    <div class="benchmark-value">15%</div>
+                    <div class="benchmark-type">Aggressive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="field-group">
@@ -680,7 +1125,7 @@
 
           <div class="nav-buttons">
             <button class="btn-nav" onclick="prevPage()">Previous</button>
-            <button class="btn-nav primary" onclick="calculate()">Calculate Results</button>
+            <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
         </div>
 
@@ -709,12 +1154,12 @@
       </div>
     </div>
 
-    <!-- Page 5: Results -->
+    <!-- Page 5: Current Marketing Results (Baseline) -->
     <div class="page" id="page5">
       <div class="wizard-layout">
         <div class="input-panel">
-          <h2 class="panel-title">Your Results</h2>
-          <p class="panel-subtitle">Here's the projected impact of your campaign with measurement-driven optimization.</p>
+          <h2 class="panel-title">Current Marketing Performance</h2>
+          <p class="panel-subtitle">Based on your inputs, here's what your current marketing approach delivers without advanced measurement.</p>
 
           <div class="results-grid">
             <div class="result-card">
@@ -741,28 +1186,130 @@
               <div class="result-desc" id="o_funded_mini">—</div>
             </div>
 
-            <div class="result-card">
-              <div class="result-label">Base Revenue</div>
-              <div class="result-value" id="o_rev_base">—</div>
-              <div class="result-desc" id="o_rev_base_mini">Without measurement optimization</div>
+            <div class="result-card" style="grid-column: 1 / -1; border-color: var(--accent); border-width: 3px;">
+              <div class="result-label" style="color: var(--accent)">Total Revenue (Current State)</div>
+              <div class="result-value" style="color: var(--accent)" id="o_rev_base">—</div>
+              <div class="result-desc" id="o_rev_base_mini">Revenue from current marketing without measurement optimization</div>
             </div>
+          </div>
 
-            <div class="result-card">
-              <div class="result-label">Revenue with Measurement</div>
-              <div class="result-value" id="o_rev_meas">—</div>
-              <div class="result-desc" id="o_rev_meas_mini">With measurement optimization</div>
+          <div class="nav-buttons">
+            <button class="btn-nav" onclick="prevPage()">Previous</button>
+            <button class="btn-nav primary" onclick="calculateAndNext()">See Impact of Measurement</button>
+          </div>
+        </div>
+
+        <div class="info-panel">
+          <h3 class="info-title">Your Current State</h3>
+          <div class="info-content">
+            <p>These numbers represent your <strong>baseline performance</strong> using traditional marketing approaches without advanced measurement and attribution.</p>
+            
+            <div class="info-highlight">
+              📊 <strong>Current Approach:</strong> Many financial organizations rely on basic conversion tracking without deep attribution insights, leading to suboptimal budget allocation.
             </div>
+            
+            <p><strong>Common challenges without measurement:</strong></p>
+            <ul>
+              <li><strong>Blind spots:</strong> Unclear which channels drive actual conversions</li>
+              <li><strong>Wasted spend:</strong> Budget allocated to underperforming tactics</li>
+              <li><strong>Slow optimization:</strong> Long cycles to identify what works</li>
+              <li><strong>Missed opportunities:</strong> High-intent audiences remain untapped</li>
+            </ul>
+            
+            <p>On the next page, you'll see how measurement-driven optimization transforms these results.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <div class="result-card" style="border-color: var(--success); border-width: 3px;">
-              <div class="result-label" style="color: var(--success)">⬆ Incremental Loans</div>
-              <div class="result-value" style="color: var(--success)" id="o_inc_funded">—</div>
-              <div class="result-desc" id="o_inc_funded_mini">Additional funded applications</div>
+    <!-- Page 6: Results with Measurement -->
+    <div class="page" id="page6">
+      <div class="wizard-layout">
+        <div class="input-panel">
+          <h2 class="panel-title">Impact of Measurement on Your Marketing</h2>
+          <p class="panel-subtitle">Here's the comprehensive incremental value created through measurement-driven optimization.</p>
+
+          <!-- Section 1: Financial Impact to Media -->
+          <div style="margin-top: 24px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--accent); margin: 0 0 16px;">Financial Impact to Media (Increased Impressions)</h3>
+            <div class="results-grid">
+              <div class="result-card">
+                <div class="result-label">Increased Impression Levels</div>
+                <div class="result-value" id="o_increased_impr">—</div>
+                <div class="result-desc">Additional impressions from optimization</div>
+              </div>
+
+              <div class="result-card" style="border-color: var(--accent); border-width: 2px;">
+                <div class="result-label" style="color: var(--accent)">Monetary Value of Added Impressions</div>
+                <div class="result-value" style="color: var(--accent)" id="o_impr_value">—</div>
+                <div class="result-desc">Dollar value of incremental impressions</div>
+              </div>
             </div>
+          </div>
 
-            <div class="result-card" style="border-color: var(--success); border-width: 3px;">
-              <div class="result-label" style="color: var(--success)">⬆ Incremental Revenue</div>
-              <div class="result-value" style="color: var(--success)" id="o_inc_rev">—</div>
-              <div class="result-desc" id="o_inc_rev_mini">Additional revenue from measurement</div>
+          <!-- Section 2: Incremental Revenue from Increased Impressions -->
+          <div style="margin-top: 32px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--success); margin: 0 0 16px;">Incremental Revenue (Increased Impressions)</h3>
+            <div class="results-grid">
+              <div class="result-card">
+                <div class="result-label">Total Incremental Applications Funded</div>
+                <div class="result-value" id="o_inc_funded_impr">—</div>
+                <div class="result-desc">From increased impression levels</div>
+              </div>
+
+              <div class="result-card" style="border-color: var(--success); border-width: 2px;">
+                <div class="result-label" style="color: var(--success)">⬆ Incremental Direct Revenue</div>
+                <div class="result-value" style="color: var(--success)" id="o_inc_rev_impr">—</div>
+                <div class="result-desc">Revenue from impression optimization</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Incremental Revenue from Better Retargeting -->
+          <div style="margin-top: 32px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--success); margin: 0 0 16px;">Incremental Revenue (Better Retargeting)</h3>
+            <div class="results-grid">
+              <div class="result-card">
+                <div class="result-label">Current Site Visitors Identified</div>
+                <div class="result-value" id="o_current_identified">—</div>
+                <div class="result-desc">Visitors currently identified</div>
+              </div>
+
+              <div class="result-card">
+                <div class="result-label">Additional Site Visitors Identified</div>
+                <div class="result-value" id="o_additional_identified">—</div>
+                <div class="result-desc">With identity technology</div>
+              </div>
+
+              <div class="result-card">
+                <div class="result-label">Additional Conversions from Retargeting</div>
+                <div class="result-value" id="o_retarget_conversions">—</div>
+                <div class="result-desc">Incremental funded applications</div>
+              </div>
+
+              <div class="result-card" style="border-color: var(--success); border-width: 2px;">
+                <div class="result-label" style="color: var(--success)">⬆ Revenue from Retargeting</div>
+                <div class="result-value" style="color: var(--success)" id="o_inc_rev_retarget">—</div>
+                <div class="result-desc">Incremental revenue from better targeting</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Financial Summary Impact -->
+          <div style="margin-top: 32px; padding: 24px; background: var(--info-bg); border: 2px solid var(--accent); border-radius: 16px;">
+            <h3 style="font-size: 18px; font-weight: 900; color: var(--accent); margin: 0 0 20px; text-align: center;">💰 Total Financial Summary Impact</h3>
+            <div class="results-grid">
+              <div class="result-card" style="background: #fff;">
+                <div class="result-label">Incremental Value of Added Impressions</div>
+                <div class="result-value" id="o_total_impr_value">—</div>
+                <div class="result-desc">Total value from impression optimization</div>
+              </div>
+
+              <div class="result-card" style="background: var(--success); border-color: var(--success);">
+                <div class="result-label" style="color: #fff;">⬆⬆ TOTAL Incremental Direct Revenue</div>
+                <div class="result-value" style="color: #fff; font-size: 32px;" id="o_total_inc_rev">—</div>
+                <div class="result-desc" style="color: rgba(255,255,255,0.9);">Combined revenue from all measurement improvements</div>
+              </div>
             </div>
           </div>
 
@@ -774,21 +1321,34 @@
         </div>
 
         <div class="info-panel">
-          <h3 class="info-title">Understanding Your Impact</h3>
+          <h3 class="info-title">The Measurement Advantage</h3>
           <div class="info-content">
-            <p>These results show the projected performance of your digital marketing investment with and without measurement-driven optimization.</p>
+            <p>Advanced measurement transforms your marketing investment through <strong>three key mechanisms</strong>:</p>
+            
+            <p><strong>1. Impression Optimization:</strong></p>
+            <ul>
+              <li>Suppress wasted impressions to existing customers</li>
+              <li>Control frequency to prevent over/under-exposure</li>
+              <li>Recapture budget to reach new prospects</li>
+            </ul>
+
+            <p><strong>2. Better Retargeting:</strong></p>
+            <ul>
+              <li>Identify more site visitors with ID technology</li>
+              <li>Create larger retargeting audiences</li>
+              <li>Convert high-intent visitors more effectively</li>
+            </ul>
+
+            <p><strong>3. Combined Impact:</strong></p>
+            <ul>
+              <li>Measurement creates value through multiple channels</li>
+              <li>Effects compound for maximum ROI</li>
+              <li>Data-driven optimization accelerates learning</li>
+            </ul>
             
             <div class="info-highlight">
-              🎯 <strong>Key Insight:</strong> The incremental revenue represents the additional business value created by implementing proper measurement and attribution.
+              💡 <strong>Key Insight:</strong> The total incremental revenue represents the combined power of impression optimization and better audience identification working together.
             </div>
-            
-            <p><strong>What drives the lift:</strong></p>
-            <ul>
-              <li><strong>Smarter targeting:</strong> Measurement reveals which audiences convert best</li>
-              <li><strong>Creative optimization:</strong> Real-time insights show what messaging works</li>
-              <li><strong>Budget efficiency:</strong> Allocate spend to highest-performing channels</li>
-              <li><strong>Faster learning:</strong> Shorten the cycle from test to optimization</li>
-            </ul>
             
             <p><strong>Next steps:</strong></p>
             <ul>
@@ -806,17 +1366,22 @@
   const $ = (id) => document.getElementById(id);
 
   let currentPage = 1;
-  const totalPages = 5;
+  const totalPages = 6;
 
   const els = {
-    benchmarkSelect: $("benchmarkSelect"),
     budget: $("budget"),
     cpm: $("cpm"),
+    suppressionPct: $("suppressionPct"),
+    frequencyPct: $("frequencyPct"),
     ctr: $("ctr"),
     startRate: $("startRate"),
     completionRate: $("completionRate"),
     fundedRate: $("fundedRate"),
     siteVisitors: $("siteVisitors"),
+    visitorIdPct: $("visitorIdPct"),
+    additionalIdPct: $("additionalIdPct"),
+    retargetCtr: $("retargetCtr"),
+    retargetConversion: $("retargetConversion"),
     ltv: $("ltv"),
     liftPct: $("liftPct"),
     notes: $("notes"),
@@ -838,6 +1403,19 @@
     o_inc_funded_mini: $("o_inc_funded_mini"),
     o_inc_rev: $("o_inc_rev"),
     o_inc_rev_mini: $("o_inc_rev_mini"),
+    o_funded_meas: $("o_funded_meas"),
+    
+    // New outputs for Page 6
+    o_increased_impr: $("o_increased_impr"),
+    o_impr_value: $("o_impr_value"),
+    o_inc_funded_impr: $("o_inc_funded_impr"),
+    o_inc_rev_impr: $("o_inc_rev_impr"),
+    o_current_identified: $("o_current_identified"),
+    o_additional_identified: $("o_additional_identified"),
+    o_retarget_conversions: $("o_retarget_conversions"),
+    o_inc_rev_retarget: $("o_inc_rev_retarget"),
+    o_total_impr_value: $("o_total_impr_value"),
+    o_total_inc_rev: $("o_total_inc_rev"),
   };
 
   // Benchmarks
@@ -845,33 +1423,51 @@
     standard: {
       budget: 10000000,
       cpm: 15,
+      suppressionPct: 10,
+      frequencyPct: 10,
       ctr: 0.15,
       startRate: 0.40,
       completionRate: 40,
       fundedRate: 50,
       siteVisitors: 1200000,
+      visitorIdPct: 45,
+      additionalIdPct: 35,
+      retargetCtr: 0.70,
+      retargetConversion: 0.75,
       ltv: 9000,
       liftPct: 10
     },
     conservative: {
       budget: 5000000,
       cpm: 18,
+      suppressionPct: 5,
+      frequencyPct: 5,
       ctr: 0.10,
       startRate: 0.30,
       completionRate: 35,
       fundedRate: 45,
       siteVisitors: 800000,
+      visitorIdPct: 40,
+      additionalIdPct: 33,
+      retargetCtr: 0.60,
+      retargetConversion: 0.60,
       ltv: 9000,
       liftPct: 7.5
     },
     aggressive: {
       budget: 15000000,
       cpm: 12,
+      suppressionPct: 15,
+      frequencyPct: 15,
       ctr: 0.25,
       startRate: 0.60,
       completionRate: 45,
       fundedRate: 60,
       siteVisitors: 1500000,
+      visitorIdPct: 50,
+      additionalIdPct: 38,
+      retargetCtr: 0.80,
+      retargetConversion: 0.85,
       ltv: 9000,
       liftPct: 15
     }
@@ -880,6 +1476,15 @@
   // Navigation
   function nextPage(){
     if (currentPage < totalPages){
+      // If moving from page 4 to page 5, calculate results
+      if (currentPage === 4) {
+        try {
+          calculate();
+        } catch(e) {
+          // Don't advance if calculation fails
+          return;
+        }
+      }
       currentPage++;
       showPage(currentPage);
     }
@@ -1000,6 +1605,9 @@
     const cpm = parseNumberFromInput(els.cpm);
     if (!isFinite(cpm) || cpm < 2) throw new Error("CPM must be a number ≥ 2.");
 
+    const suppressionPct = pctToDec(parseNumberFromInput(els.suppressionPct), "Customer Suppression Rate (%)");
+    const frequencyPct = pctToDec(parseNumberFromInput(els.frequencyPct), "Impression Frequency Control (%)");
+
     const ctr = pctToDec(parseNumberFromInput(els.ctr), "Click-Through Rate (%)");
     const startRate = pctToDec(parseNumberFromInput(els.startRate), "Application Start Rate (%)");
     const completionRate = pctToDec(parseNumberFromInput(els.completionRate), "Application Completion Rate (%)");
@@ -1008,12 +1616,20 @@
     const siteVisitors = parseNumberFromInput(els.siteVisitors);
     if (!isFinite(siteVisitors) || siteVisitors < 0) throw new Error("Site Visitors must be a number ≥ 0.");
 
+    const visitorIdPct = pctToDec(parseNumberFromInput(els.visitorIdPct), "Current % of Site Visitors Identified (%)");
+    const additionalIdPct = pctToDec(parseNumberFromInput(els.additionalIdPct), "Additional Visitors Identified (%)");
+    const retargetCtr = pctToDec(parseNumberFromInput(els.retargetCtr), "Retargeting CTR/VTR (%)");
+    const retargetConversion = pctToDec(parseNumberFromInput(els.retargetConversion), "Retargeting Conversion Rate (%)");
+
     const ltv = parseNumberFromInput(els.ltv);
     if (!isFinite(ltv) || ltv < 0) throw new Error("Lifetime Value must be ≥ 0.");
 
     const liftPct = pctToDec(parseNumberFromInput(els.liftPct), "Incremental Lift (%)");
 
-    return { budget, cpm, ctr, startRate, completionRate, fundedRate, siteVisitors, ltv, liftPct };
+    return { 
+      budget, cpm, suppressionPct, frequencyPct, ctr, startRate, completionRate, fundedRate, 
+      siteVisitors, visitorIdPct, additionalIdPct, retargetCtr, retargetConversion, ltv, liftPct 
+    };
   }
 
   function calculate(){
@@ -1021,19 +1637,14 @@
       showErr("");
       const i = readInputs();
 
+      // Baseline calculations
       const impressions = (i.budget / i.cpm) * 1000;
       const totalStarts = impressions * i.ctr * i.startRate;
       const totalCompletions = totalStarts * i.completionRate;
       const totalFunded = totalCompletions * i.fundedRate;
-
       const baseRevenue = totalFunded * i.ltv;
 
-      const measFunded = totalFunded * (1 + i.liftPct);
-      const measRevenue = measFunded * i.ltv;
-
-      const incFunded = measFunded - totalFunded;
-      const incRevenue = measRevenue - baseRevenue;
-
+      // Baseline metrics (shown on page 5)
       els.o_impr.textContent = fmtInt(impressions);
       els.o_impr_mini.textContent = "From your media budget and CPM";
 
@@ -1044,10 +1655,53 @@
       els.o_comp_mini.textContent = "Applications that are completed";
 
       els.o_funded.textContent = fmtInt(totalFunded);
-      els.o_funded_mini.textContent = "Successfully funded loans";
+      els.o_funded_mini.textContent = "Successfully funded loans (baseline)";
 
       els.o_rev_base.textContent = fmtMoney0(baseRevenue);
       els.o_rev_base_mini.textContent = "Total revenue without optimization";
+
+      // ===== NEW CALCULATIONS FOR PAGE 6 =====
+      
+      // 1. Financial Impact to Media (Increased Impressions)
+      const impressionOptimization = i.suppressionPct + i.frequencyPct;
+      const increasedImpressions = impressions * impressionOptimization;
+      const monetaryValueOfImpressions = (increasedImpressions / 1000) * i.cpm;
+
+      els.o_increased_impr.textContent = fmtInt(increasedImpressions);
+      els.o_impr_value.textContent = fmtMoney0(monetaryValueOfImpressions);
+
+      // 2. Incremental Revenue from Increased Impressions
+      const incStarts = increasedImpressions * i.ctr * i.startRate;
+      const incCompletions = incStarts * i.completionRate;
+      const incFundedFromImpressions = incCompletions * i.fundedRate;
+      const incRevenueFromImpressions = incFundedFromImpressions * i.ltv;
+
+      els.o_inc_funded_impr.textContent = fmtInt(incFundedFromImpressions);
+      els.o_inc_rev_impr.textContent = fmtMoney0(incRevenueFromImpressions);
+
+      // 3. Incremental Revenue from Better Retargeting
+      const currentIdentified = i.siteVisitors * i.visitorIdPct;
+      const additionalIdentified = i.siteVisitors * i.additionalIdPct;
+      const retargetClicks = additionalIdentified * i.retargetCtr;
+      const retargetConversions = retargetClicks * i.retargetConversion;
+      const incRevenueFromRetargeting = retargetConversions * i.ltv;
+
+      els.o_current_identified.textContent = fmtInt(currentIdentified);
+      els.o_additional_identified.textContent = fmtInt(additionalIdentified);
+      els.o_retarget_conversions.textContent = fmtInt(retargetConversions);
+      els.o_inc_rev_retarget.textContent = fmtMoney0(incRevenueFromRetargeting);
+
+      // 4. Financial Summary Impact
+      const totalIncrementalRevenue = incRevenueFromImpressions + incRevenueFromRetargeting;
+
+      els.o_total_impr_value.textContent = fmtMoney0(monetaryValueOfImpressions);
+      els.o_total_inc_rev.textContent = fmtMoney0(totalIncrementalRevenue);
+
+      // Legacy outputs (kept for compatibility)
+      const measFunded = totalFunded * (1 + i.liftPct);
+      const measRevenue = measFunded * i.ltv;
+      const incFunded = measFunded - totalFunded;
+      const incRevenue = measRevenue - baseRevenue;
 
       els.o_rev_meas.textContent = fmtMoney0(measRevenue);
       els.o_rev_meas_mini.textContent = "Total revenue with measurement";
@@ -1058,22 +1712,39 @@
       els.o_inc_rev.textContent = fmtMoney0(incRevenue);
       els.o_inc_rev_mini.textContent = "Additional revenue from measurement";
 
-      nextPage();
+      els.o_funded_meas.textContent = fmtInt(measFunded);
+
     } catch(e){
       showErr(e.message || "Please check your inputs.");
+      throw e;
     }
   }
 
-  function applyPreset(presetKey){
-    const b = BENCHMARKS[presetKey] || BENCHMARKS.standard;
+  function calculateAndNext(){
+    try{
+      calculate();
+      nextPage();
+    } catch(e){
+      // Error already shown by calculate()
+    }
+  }
+
+  function applyPreset(){
+    const b = BENCHMARKS.standard;
 
     setFormattedCurrency(els.budget, b.budget, 0);
     setFormattedCurrency(els.cpm, b.cpm, 2);
+    setFormattedPercent(els.suppressionPct, b.suppressionPct);
+    setFormattedPercent(els.frequencyPct, b.frequencyPct);
     setFormattedPercent(els.ctr, b.ctr);
     setFormattedPercent(els.startRate, b.startRate);
     setFormattedPercent(els.completionRate, b.completionRate);
     setFormattedPercent(els.fundedRate, b.fundedRate);
     setFormattedInteger(els.siteVisitors, b.siteVisitors);
+    setFormattedPercent(els.visitorIdPct, b.visitorIdPct);
+    setFormattedPercent(els.additionalIdPct, b.additionalIdPct);
+    setFormattedPercent(els.retargetCtr, b.retargetCtr);
+    setFormattedPercent(els.retargetConversion, b.retargetConversion);
     setFormattedCurrency(els.ltv, b.ltv, 2);
     setFormattedPercent(els.liftPct, b.liftPct);
 
@@ -1170,14 +1841,13 @@
   wireCurrency("cpm", BENCHMARKS.standard.cpm, 2);
   wireCurrency("ltv", BENCHMARKS.standard.ltv, 2);
   wireInteger("siteVisitors", BENCHMARKS.standard.siteVisitors);
-  ["ctr","startRate","completionRate","fundedRate","liftPct"].forEach(wirePercent);
+  ["ctr","startRate","completionRate","fundedRate","liftPct","suppressionPct","frequencyPct","visitorIdPct","additionalIdPct","retargetCtr","retargetConversion"].forEach(wirePercent);
 
   // Init
-  applyPreset("standard");
+  applyPreset();
 
   // Events
-  els.benchmarkSelect.addEventListener("change", () => applyPreset(els.benchmarkSelect.value));
-  $("resetBtn").addEventListener("click", () => applyPreset(els.benchmarkSelect.value));
+  $("resetBtn").addEventListener("click", () => applyPreset());
 </script>
 </body>
 </html>
