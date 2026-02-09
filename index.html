@@ -165,13 +165,59 @@
       align-items: start;
     }
 
-    /* Left panel - inputs */
+    /* Left panel - info/text */
+    .info-panel{
+      position: sticky;
+      top: 100px;
+      background: var(--info-bg);
+      border: 2px solid var(--info-border);
+      border-radius: 16px;
+      padding: 32px;
+      min-height: 300px;
+      order: 1;
+    }
+    .info-title{
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 16px;
+      color: var(--accent);
+    }
+    .info-content{
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .info-content p{
+      margin: 0 0 14px;
+    }
+    .info-content p:last-child{
+      margin-bottom: 0;
+    }
+    .info-content ul{
+      margin: 12px 0;
+      padding-left: 20px;
+    }
+    .info-content li{
+      margin-bottom: 8px;
+    }
+    .info-highlight{
+      background: rgba(47,91,255,.08);
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Right panel - inputs */
     .input-panel{
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 32px;
       box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      order: 2;
     }
     .panel-title{
       font-size: 24px;
@@ -334,50 +380,6 @@
       color: var(--accent);
     }
 
-    /* Right panel - info/text */
-    .info-panel{
-      position: sticky;
-      top: 100px;
-      background: var(--info-bg);
-      border: 2px solid var(--info-border);
-      border-radius: 16px;
-      padding: 32px;
-      min-height: 300px;
-    }
-    .info-title{
-      font-size: 20px;
-      font-weight: 800;
-      margin: 0 0 16px;
-      color: var(--accent);
-    }
-    .info-content{
-      font-size: 14px;
-      line-height: 1.7;
-      color: var(--text);
-    }
-    .info-content p{
-      margin: 0 0 14px;
-    }
-    .info-content p:last-child{
-      margin-bottom: 0;
-    }
-    .info-content ul{
-      margin: 12px 0;
-      padding-left: 20px;
-    }
-    .info-content li{
-      margin-bottom: 8px;
-    }
-    .info-highlight{
-      background: rgba(47,91,255,.08);
-      border-left: 3px solid var(--accent);
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin: 16px 0;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
     /* Navigation buttons */
     .nav-buttons{
       display: flex;
@@ -485,7 +487,10 @@
       }
       .info-panel{
         position: static;
-        order: -1;
+        order: 1;
+      }
+      .input-panel{
+        order: 2;
       }
       .stepper{
         flex-wrap: wrap;
@@ -565,9 +570,35 @@
 
   <!-- Main content -->
   <div class="container">
+    <!-- Main Calculator Title -->
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h1 style="font-size: 32px; font-weight: 900; color: var(--accent); margin: 0 0 8px;">Home Mortgage Incremental Digital Marketing Calculator</h1>
+      <p style="font-size: 18px; font-weight: 600; color: var(--accent); margin: 0;">How Measurement Can Impact Your Performance</p>
+    </div>
+
     <!-- Page 1: Budget & CPM -->
     <div class="page active" id="page1">
       <div class="wizard-layout">
+        <div class="info-panel">
+          <h3 class="info-title">Understanding Your Media Investment</h3>
+          <div class="info-content">
+            <p>Your <strong>digital marketing budget</strong> is the foundation of your campaign reach. This includes all spending on display advertising and Connected TV (CTV) campaigns.</p>
+            
+            <p>The <strong>CPM (Cost Per Mille)</strong> represents how efficiently you're buying media. Lower CPMs mean more impressions for your budget, while higher CPMs often indicate premium placements or targeted audiences.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Tip:</strong> A blended CPM of $15-25 is typical for financial services. Premium placements and highly targeted audiences may cost $30-50 CPM.
+            </div>
+            
+            <p><strong>Why this matters:</strong></p>
+            <ul>
+              <li>Budget and CPM determine your total impression volume</li>
+              <li>More impressions = more opportunities to reach prospects</li>
+              <li>Efficient CPMs maximize your campaign reach</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="input-panel">
           <h2 class="panel-title">Budget & Media Cost</h2>
           <p class="panel-subtitle">Start by entering your digital marketing budget and estimated cost per thousand impressions.</p>
@@ -651,7 +682,7 @@
               <input id="frequencyPct" class="pad-right" inputmode="decimal" value="10.00" required>
               <span class="suffix">%</span>
             </div>
-            <div class="hint">Percentage of impressions optimized by controlling over/under exposure</div>
+            <div class="hint">Percentage of impressions optimized by balancing exposure—reducing waste on over-exposed prospects while reaching under-exposed or untapped audiences. Note: DSP frequency caps use cookies. Semcasting uses deterministic household/person identifiers for true control, resulting in more precisely targeted impressions.</div>
             
             <div class="benchmark-range">
               <div class="benchmark-label">Industry Benchmarks</div>
@@ -682,32 +713,32 @@
             <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
         </div>
-
-        <div class="info-panel">
-          <h3 class="info-title">Understanding Your Media Investment</h3>
-          <div class="info-content">
-            <p>Your <strong>digital marketing budget</strong> is the foundation of your campaign reach. This includes all spending on display advertising and Connected TV (CTV) campaigns.</p>
-            
-            <p>The <strong>CPM (Cost Per Mille)</strong> represents how efficiently you're buying media. Lower CPMs mean more impressions for your budget, while higher CPMs often indicate premium placements or targeted audiences.</p>
-            
-            <div class="info-highlight">
-              💡 <strong>Tip:</strong> A blended CPM of $15-25 is typical for financial services. Premium placements and highly targeted audiences may cost $30-50 CPM.
-            </div>
-            
-            <p><strong>Why this matters:</strong></p>
-            <ul>
-              <li>Budget and CPM determine your total impression volume</li>
-              <li>More impressions = more opportunities to reach prospects</li>
-              <li>Efficient CPMs maximize your campaign reach</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Page 2: Performance Metrics -->
     <div class="page" id="page2">
       <div class="wizard-layout">
+        <div class="info-panel">
+          <h3 class="info-title">Measuring Campaign Engagement</h3>
+          <div class="info-content">
+            <p>The <strong>CTR/VTR</strong> shows how compelling your creative is and how well you're targeting the right audience. This metric bridges the gap between impressions and actual site traffic.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Benchmark:</strong> Financial services typically see 0.10-0.25% CTR for display ads. CTV campaigns often have lower direct CTR but higher brand lift.
+            </div>
+            
+            <p><strong>Current site visitors</strong> provides context for your existing funnel performance. Understanding your baseline helps measure the true incremental impact of new campaigns.</p>
+            
+            <p><strong>What to expect:</strong></p>
+            <ul>
+              <li>Display ads: 0.10-0.20% CTR average</li>
+              <li>CTV campaigns: Focus on view-through attribution</li>
+              <li>Financial products: Lower CTR but higher intent</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="input-panel">
           <h2 class="panel-title">Campaign Performance</h2>
           <p class="panel-subtitle">Enter your expected click-through and view-through rates, plus current site traffic.</p>
@@ -883,32 +914,39 @@
             <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
         </div>
-
-        <div class="info-panel">
-          <h3 class="info-title">Measuring Campaign Engagement</h3>
-          <div class="info-content">
-            <p>The <strong>CTR/VTR</strong> shows how compelling your creative is and how well you're targeting the right audience. This metric bridges the gap between impressions and actual site traffic.</p>
-            
-            <div class="info-highlight">
-              💡 <strong>Benchmark:</strong> Financial services typically see 0.10-0.25% CTR for display ads. CTV campaigns often have lower direct CTR but higher brand lift.
-            </div>
-            
-            <p><strong>Current site visitors</strong> provides context for your existing funnel performance. Understanding your baseline helps measure the true incremental impact of new campaigns.</p>
-            
-            <p><strong>What to expect:</strong></p>
-            <ul>
-              <li>Display ads: 0.10-0.20% CTR average</li>
-              <li>CTV campaigns: Focus on view-through attribution</li>
-              <li>Financial products: Lower CTR but higher intent</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Page 3: Conversion Funnel -->
     <div class="page" id="page3">
       <div class="wizard-layout">
+        <div class="info-panel">
+          <h3 class="info-title">Optimizing Your Funnel</h3>
+          <div class="info-content">
+            <p>You know your metrics best. These are your numbers but we've provided some industry benchmark numbers for you to compare against. Your conversion funnel shows where prospects drop off between awareness and closing. Each stage represents a critical decision point.</p>
+            
+            <p><strong>Application Start Rate:</strong> The bridge between browsing and serious intent. Higher rates indicate strong value proposition and clear calls-to-action.</p>
+            
+            <p><strong>Completion Rate:</strong> Measures friction in your application process. Abandonment often happens due to complexity or time requirements.</p>
+            
+            <p><strong>Funded Rate:</strong> Reflects credit quality of applicants and your underwriting criteria. This is where qualification meets approval.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Industry averages:</strong><br>
+              Start Rate: 0.3-0.6%<br>
+              Completion: 35-45%<br>
+              Funded: 45-60%
+            </div>
+            
+            <p><strong>Optimization opportunities:</strong></p>
+            <ul>
+              <li>Simplify application flow to boost completion</li>
+              <li>Better pre-qualification to improve funded rate</li>
+              <li>A/B test CTAs to increase start rate</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="input-panel">
           <h2 class="panel-title">Conversion Funnel</h2>
           <p class="panel-subtitle">Define your application funnel from start to completion to funding.</p>
@@ -1014,39 +1052,35 @@
             <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
         </div>
-
-        <div class="info-panel">
-          <h3 class="info-title">Optimizing Your Funnel</h3>
-          <div class="info-content">
-            <p>You know your metrics best. These are your numbers but we've provided some industry benchmark numbers for you to compare against. Your conversion funnel shows where prospects drop off between awareness and closing. Each stage represents a critical decision point.</p>
-            
-            <p><strong>Application Start Rate:</strong> The bridge between browsing and serious intent. Higher rates indicate strong value proposition and clear calls-to-action.</p>
-            
-            <p><strong>Completion Rate:</strong> Measures friction in your application process. Abandonment often happens due to complexity or time requirements.</p>
-            
-            <p><strong>Funded Rate:</strong> Reflects credit quality of applicants and your underwriting criteria. This is where qualification meets approval.</p>
-            
-            <div class="info-highlight">
-              💡 <strong>Industry averages:</strong><br>
-              Start Rate: 0.3-0.6%<br>
-              Completion: 35-45%<br>
-              Funded: 45-60%
-            </div>
-            
-            <p><strong>Optimization opportunities:</strong></p>
-            <ul>
-              <li>Simplify application flow to boost completion</li>
-              <li>Better pre-qualification to improve funded rate</li>
-              <li>A/B test CTAs to increase start rate</li>
-            </ul>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Page 4: Value & Lift -->
     <div class="page" id="page4">
       <div class="wizard-layout">
+        <div class="info-panel">
+          <h3 class="info-title">Quantifying Success</h3>
+          <div class="info-content">
+            <p><strong>Lifetime Value (LTV)</strong> represents the total profit you earn from each funded loan over its lifetime. This includes origination fees, servicing revenue, and any other monetization.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Typical LTV for mortgages:</strong> $8,000-12,000 depending on loan size, rate, and whether you service or sell the loan.
+            </div>
+            
+            <p><strong>Measurement Lift</strong> quantifies how better attribution and insights improve campaign performance. When you can accurately measure what works, you optimize faster and waste less budget.</p>
+            
+            <p><strong>How measurement creates lift:</strong></p>
+            <ul>
+              <li><strong>Better targeting:</strong> Identify and reach high-intent audiences</li>
+              <li><strong>Creative optimization:</strong> Double down on messaging that converts</li>
+              <li><strong>Channel allocation:</strong> Shift spend to highest-performing channels</li>
+              <li><strong>Reduced waste:</strong> Eliminate underperforming campaigns faster</li>
+            </ul>
+            
+            <p>Industry studies show measurement-driven optimization typically delivers 7-15% lift in campaign performance over baseline approaches.</p>
+          </div>
+        </div>
+
         <div class="input-panel">
           <h2 class="panel-title">Value & Measurement Impact</h2>
           <p class="panel-subtitle">Enter the lifetime value of each customer and expected measurement lift.</p>
@@ -1128,35 +1162,33 @@
             <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
         </div>
-
-        <div class="info-panel">
-          <h3 class="info-title">Quantifying Success</h3>
-          <div class="info-content">
-            <p><strong>Lifetime Value (LTV)</strong> represents the total profit you earn from each funded loan over its lifetime. This includes origination fees, servicing revenue, and any other monetization.</p>
-            
-            <div class="info-highlight">
-              💡 <strong>Typical LTV for mortgages:</strong> $8,000-12,000 depending on loan size, rate, and whether you service or sell the loan.
-            </div>
-            
-            <p><strong>Measurement Lift</strong> quantifies how better attribution and insights improve campaign performance. When you can accurately measure what works, you optimize faster and waste less budget.</p>
-            
-            <p><strong>How measurement creates lift:</strong></p>
-            <ul>
-              <li><strong>Better targeting:</strong> Identify and reach high-intent audiences</li>
-              <li><strong>Creative optimization:</strong> Double down on messaging that converts</li>
-              <li><strong>Channel allocation:</strong> Shift spend to highest-performing channels</li>
-              <li><strong>Reduced waste:</strong> Eliminate underperforming campaigns faster</li>
-            </ul>
-            
-            <p>Industry studies show measurement-driven optimization typically delivers 7-15% lift in campaign performance over baseline approaches.</p>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Page 5: Current Marketing Results (Baseline) -->
     <div class="page" id="page5">
       <div class="wizard-layout">
+        <div class="info-panel">
+          <h3 class="info-title">Your Current State</h3>
+          <div class="info-content">
+            <p>These numbers represent your <strong>baseline performance</strong> using traditional marketing approaches without advanced measurement and attribution.</p>
+            
+            <div class="info-highlight">
+              📊 <strong>Current Approach:</strong> Many financial organizations rely on basic conversion tracking without deep attribution insights, leading to suboptimal budget allocation.
+            </div>
+            
+            <p><strong>Common challenges without measurement:</strong></p>
+            <ul>
+              <li><strong>Blind spots:</strong> Unclear which channels drive actual conversions</li>
+              <li><strong>Wasted spend:</strong> Budget allocated to underperforming tactics</li>
+              <li><strong>Slow optimization:</strong> Long cycles to identify what works</li>
+              <li><strong>Missed opportunities:</strong> High-intent audiences remain untapped</li>
+            </ul>
+            
+            <p>On the next page, you'll see how measurement-driven optimization transforms these results.</p>
+          </div>
+        </div>
+
         <div class="input-panel">
           <h2 class="panel-title">Current Marketing Performance</h2>
           <p class="panel-subtitle">Based on your inputs, here's what your current marketing approach delivers without advanced measurement.</p>
@@ -1198,33 +1230,51 @@
             <button class="btn-nav primary" onclick="calculateAndNext()">See Impact of Measurement</button>
           </div>
         </div>
-
-        <div class="info-panel">
-          <h3 class="info-title">Your Current State</h3>
-          <div class="info-content">
-            <p>These numbers represent your <strong>baseline performance</strong> using traditional marketing approaches without advanced measurement and attribution.</p>
-            
-            <div class="info-highlight">
-              📊 <strong>Current Approach:</strong> Many financial organizations rely on basic conversion tracking without deep attribution insights, leading to suboptimal budget allocation.
-            </div>
-            
-            <p><strong>Common challenges without measurement:</strong></p>
-            <ul>
-              <li><strong>Blind spots:</strong> Unclear which channels drive actual conversions</li>
-              <li><strong>Wasted spend:</strong> Budget allocated to underperforming tactics</li>
-              <li><strong>Slow optimization:</strong> Long cycles to identify what works</li>
-              <li><strong>Missed opportunities:</strong> High-intent audiences remain untapped</li>
-            </ul>
-            
-            <p>On the next page, you'll see how measurement-driven optimization transforms these results.</p>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Page 6: Results with Measurement -->
     <div class="page" id="page6">
       <div class="wizard-layout">
+        <div class="info-panel">
+          <h3 class="info-title">The Measurement Advantage</h3>
+          <div class="info-content">
+            <p>Advanced measurement transforms your marketing investment through <strong>three key mechanisms</strong>:</p>
+            
+            <p><strong>1. Impression Optimization:</strong></p>
+            <ul>
+              <li>Suppress wasted impressions to existing customers</li>
+              <li>Control frequency to prevent over/under-exposure</li>
+              <li>Recapture budget to reach new prospects</li>
+            </ul>
+
+            <p><strong>2. Better Retargeting:</strong></p>
+            <ul>
+              <li>Identify more site visitors with ID technology</li>
+              <li>Create larger retargeting audiences</li>
+              <li>Convert high-intent visitors more effectively</li>
+            </ul>
+
+            <p><strong>3. Combined Impact:</strong></p>
+            <ul>
+              <li>Measurement creates value through multiple channels</li>
+              <li>Effects compound for maximum ROI</li>
+              <li>Data-driven optimization accelerates learning</li>
+            </ul>
+            
+            <div class="info-highlight">
+              💡 <strong>Key Insight:</strong> The total incremental revenue represents the combined power of impression optimization and better audience identification working together.
+            </div>
+            
+            <p><strong>Next steps:</strong></p>
+            <ul>
+              <li>Download the PDF report to share with stakeholders</li>
+              <li>Adjust inputs to model different scenarios</li>
+              <li>Contact Semcasting to discuss implementation</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="input-panel">
           <h2 class="panel-title">Impact of Measurement on Your Marketing</h2>
           <p class="panel-subtitle">Here's the comprehensive incremental value created through measurement-driven optimization.</p>
@@ -1317,45 +1367,6 @@
             <button class="btn-nav" onclick="prevPage()">Previous</button>
             <button class="btn-nav primary" onclick="downloadPDF()">Download PDF Report</button>
             <button class="btn-nav" onclick="copyLink()">Copy Shareable Link</button>
-          </div>
-        </div>
-
-        <div class="info-panel">
-          <h3 class="info-title">The Measurement Advantage</h3>
-          <div class="info-content">
-            <p>Advanced measurement transforms your marketing investment through <strong>three key mechanisms</strong>:</p>
-            
-            <p><strong>1. Impression Optimization:</strong></p>
-            <ul>
-              <li>Suppress wasted impressions to existing customers</li>
-              <li>Control frequency to prevent over/under-exposure</li>
-              <li>Recapture budget to reach new prospects</li>
-            </ul>
-
-            <p><strong>2. Better Retargeting:</strong></p>
-            <ul>
-              <li>Identify more site visitors with ID technology</li>
-              <li>Create larger retargeting audiences</li>
-              <li>Convert high-intent visitors more effectively</li>
-            </ul>
-
-            <p><strong>3. Combined Impact:</strong></p>
-            <ul>
-              <li>Measurement creates value through multiple channels</li>
-              <li>Effects compound for maximum ROI</li>
-              <li>Data-driven optimization accelerates learning</li>
-            </ul>
-            
-            <div class="info-highlight">
-              💡 <strong>Key Insight:</strong> The total incremental revenue represents the combined power of impression optimization and better audience identification working together.
-            </div>
-            
-            <p><strong>Next steps:</strong></p>
-            <ul>
-              <li>Download the PDF report to share with stakeholders</li>
-              <li>Adjust inputs to model different scenarios</li>
-              <li>Contact Semcasting to discuss implementation</li>
-            </ul>
           </div>
         </div>
       </div>
