@@ -508,6 +508,62 @@
       body{ background:#fff; }
       .input-panel{ border:0; box-shadow:none; }
     }
+
+    /* Email Modal */
+    .modal-overlay{
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active{
+      display: flex;
+    }
+    .modal{
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-title{
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+    .modal-subtitle{
+      font-size: 14px;
+      color: var(--muted2);
+      margin: 0 0 24px;
+      line-height: 1.5;
+    }
+    .modal-error{
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c00;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .modal-buttons{
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .modal-buttons button{
+      flex: 1;
+    }
   </style>
 </head>
 
@@ -1379,8 +1435,125 @@
     </div>
   </div>
 
+  <!-- Email Modal -->
+  <div class="modal-overlay" id="emailModal">
+    <div class="modal">
+      <h2 class="modal-title">Enter Your Work Email</h2>
+      <p class="modal-subtitle">To download the report or share the link, please provide your work email address.</p>
+      
+      <div class="modal-error" id="modalError"></div>
+      
+      <div class="field-group">
+        <label for="userEmail">Work Email Address</label>
+        <input id="userEmail" type="email" placeholder="you@company.com" required>
+        <div class="hint">Please use your company email (personal emails like Gmail, Yahoo are not accepted)</div>
+      </div>
+      
+      <div class="modal-buttons">
+        <button class="btn-nav" onclick="closeEmailModal()">Cancel</button>
+        <button class="btn-nav primary" onclick="submitEmail()">Continue</button>
+      </div>
+    </div>
+  </div>
+
 <script>
   const $ = (id) => document.getElementById(id);
+
+  // Email validation
+  const BLOCKED_DOMAINS = [
+    'yahoo.com', 'gmail.com', 'outlook.com', 'hotmail.com', 'live.com', 
+    'msn.com', 'zoho.com', 'mail.com', 'comcast.net', 'att.net', 
+    'bellsouth.net', 'sbcglobal.net', 'verizon.net', 'cox.net', 
+    'rocketmail.com', 'earthlink.net', 'sky.com', 'juno.com', 'aol.com'
+  ];
+
+  let pendingAction = null; // 'pdf' or 'link'
+  let userEmailValidated = false;
+  let userEmailAddress = '';
+
+  function isWorkEmail(email) {
+    if (!email || !email.includes('@')) return false;
+    const domain = email.split('@')[1].toLowerCase();
+    return !BLOCKED_DOMAINS.includes(domain);
+  }
+
+  function showModalError(msg) {
+    const err = $('modalError');
+    err.style.display = msg ? 'block' : 'none';
+    err.textContent = msg || '';
+  }
+
+  function openEmailModal(action) {
+    pendingAction = action;
+    $('emailModal').classList.add('active');
+    $('userEmail').focus();
+    showModalError('');
+  }
+
+  function closeEmailModal() {
+    $('emailModal').classList.remove('active');
+    $('userEmail').value = '';
+    pendingAction = null;
+    showModalError('');
+  }
+
+  async function submitEmail() {
+    const email = $('userEmail').value.trim();
+    
+    if (!email) {
+      showModalError('Please enter your email address.');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showModalError('Please enter a valid email address.');
+      return;
+    }
+    
+    if (!isWorkEmail(email)) {
+      showModalError('Please use your work email address. Personal email providers (Gmail, Yahoo, etc.) are not accepted.');
+      return;
+    }
+    
+    // Save email to your database
+    try {
+      // TODO: Replace this with your actual API endpoint
+      // Example:
+      // const response = await fetch('https://your-api.com/save-email', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ email: email, action: pendingAction })
+      // });
+      // if (!response.ok) throw new Error('Failed to save email');
+      
+      // For now, just log to console
+      console.log('Email submitted:', email, 'Action:', pendingAction);
+      
+      userEmailValidated = true;
+      userEmailAddress = email;
+      closeEmailModal();
+      
+      // Execute the pending action
+      if (pendingAction === 'pdf') {
+        executePDF();
+      } else if (pendingAction === 'link') {
+        executeLink();
+      }
+    } catch (error) {
+      showModalError('Failed to submit email. Please try again.');
+      console.error('Email submission error:', error);
+    }
+  }
+
+  // Handle Enter key in email modal
+  window.addEventListener('DOMContentLoaded', () => {
+    $('userEmail').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        submitEmail();
+      }
+    });
+  });
 
   let currentPage = 1;
   const totalPages = 6;
@@ -1746,52 +1919,81 @@
     showPage(1);
   }
 
-  function downloadPDF(){
-    const snap = getSnapshot();
-    const style = `
-      <style>
-        @page { margin: 18mm; }
-        body{ font-family: system-ui, sans-serif; color:#111; }
-        .hdr{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #2f5bff, #7aa2ff); display:inline-block; }
-        h1{ font-size: 18px; margin:0; }
-        .meta{ font-size: 11px; color:#666; }
-        .box{ border:1px solid #ddd; border-radius: 10px; padding: 16px; margin: 16px 0; }
-        h2{ font-size: 14px; margin: 0 0 12px; font-weight:800; }
-        table{ width:100%; border-collapse: collapse; font-size: 13px; }
-        td{ padding: 10px 8px; border-bottom: 1px solid #eee; }
-        td:first-child{ width: 65%; }
-        td:last-child{ text-align:right; font-weight:700; }
-      </style>
-    `;
+  function downloadPDF() {
+    if (!userEmailValidated) {
+      openEmailModal('pdf');
+      return;
+    }
+    executePDF();
+  }
 
+  function executePDF(){
     const escapeHtml = (str) => (str || "").toString()
       .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
 
     const inputs = [
       ["Marketing Budget", "$" + escapeHtml(els.budget.value)],
       ["Blended CPM", "$" + escapeHtml(els.cpm.value)],
+      ["Customer Suppression Rate", escapeHtml(els.suppressionPct.value) + "%"],
+      ["Impression Frequency Control", escapeHtml(els.frequencyPct.value) + "%"],
       ["Click-Through Rate", escapeHtml(els.ctr.value) + "%"],
       ["Application Start Rate", escapeHtml(els.startRate.value) + "%"],
       ["Completion Rate", escapeHtml(els.completionRate.value) + "%"],
       ["Funded Rate", escapeHtml(els.fundedRate.value) + "%"],
       ["Site Visitors", escapeHtml(els.siteVisitors.value)],
+      ["% Visitors Identified", escapeHtml(els.visitorIdPct.value) + "%"],
+      ["Additional ID with Tech", escapeHtml(els.additionalIdPct.value) + "%"],
+      ["Retargeting CTR", escapeHtml(els.retargetCtr.value) + "%"],
+      ["Retargeting Conversion", escapeHtml(els.retargetConversion.value) + "%"],
       ["LTV Per Loan", "$" + escapeHtml(els.ltv.value)],
       ["Measurement Lift", escapeHtml(els.liftPct.value) + "%"],
     ];
 
     const outputs = [
+      ["<strong>Current Marketing Performance</strong>", ""],
       ["Total Impressions", escapeHtml(els.o_impr.textContent)],
       ["Application Starts", escapeHtml(els.o_starts.textContent)],
       ["Completions", escapeHtml(els.o_comp.textContent)],
       ["Funded Loans", escapeHtml(els.o_funded.textContent)],
       ["Base Revenue", escapeHtml(els.o_rev_base.textContent)],
-      ["Revenue with Measurement", escapeHtml(els.o_rev_meas.textContent)],
-      ["Incremental Loans", escapeHtml(els.o_inc_funded.textContent)],
-      ["Incremental Revenue", escapeHtml(els.o_inc_rev.textContent)],
+      ["", ""],
+      ["<strong>Financial Impact to Media</strong>", ""],
+      ["Increased Impressions", escapeHtml(els.o_increased_impr.textContent)],
+      ["Monetary Value", escapeHtml(els.o_impr_value.textContent)],
+      ["", ""],
+      ["<strong>Incremental Revenue (From Increased Impressions)</strong>", ""],
+      ["Incremental Funded", escapeHtml(els.o_inc_funded_impr.textContent)],
+      ["Incremental Revenue", escapeHtml(els.o_inc_rev_impr.textContent)],
+      ["", ""],
+      ["<strong>Incremental Revenue (Better Retargeting)</strong>", ""],
+      ["Current Identified", escapeHtml(els.o_current_identified.textContent)],
+      ["Additional Identified", escapeHtml(els.o_additional_identified.textContent)],
+      ["Retarget Conversions", escapeHtml(els.o_retarget_conversions.textContent)],
+      ["Retargeting Revenue", escapeHtml(els.o_inc_rev_retarget.textContent)],
+      ["", ""],
+      ["<strong>TOTAL FINANCIAL SUMMARY</strong>", ""],
+      ["Total Impression Value", escapeHtml(els.o_total_impr_value.textContent)],
+      ["TOTAL Incremental Revenue", escapeHtml(els.o_total_inc_rev.textContent)],
     ];
 
     const rows = (arr) => arr.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+
+    const style = `
+      <style>
+        @page { margin: 18mm; }
+        body{ font-family: system-ui, sans-serif; color:#111; }
+        .hdr{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #2f5bff, #7aa2ff); display:inline-block; }
+        h1{ font-size: 18px; margin:0; color: #2f5bff; }
+        .meta{ font-size: 11px; color:#666; }
+        .box{ border:1px solid #ddd; border-radius: 10px; padding: 16px; margin: 16px 0; }
+        h2{ font-size: 14px; margin: 0 0 12px; font-weight:800; color: #10b981; }
+        table{ width:100%; border-collapse: collapse; font-size: 13px; }
+        td{ padding: 10px 8px; border-bottom: 1px solid #eee; }
+        td:first-child{ width: 65%; }
+        td:last-child{ text-align:right; font-weight:700; }
+      </style>
+    `;
 
     const html = `
       <!doctype html>
@@ -1801,7 +2003,8 @@
         <div class="hdr">
           <div>
             <div class="logo"></div>
-            <h1>Semcasting — Media Performance Report</h1>
+            <h1>Home Mortgage Incremental Digital Marketing Calculator</h1>
+            <p style="margin:4px 0 0; font-size:13px; color:#2f5bff;">How Measurement Can Impact Your Performance</p>
           </div>
           <div class="meta">Generated ${new Date().toLocaleString()}</div>
         </div>
@@ -1819,11 +2022,15 @@
     }
   }
 
-  function getSnapshot(){
-    return { generatedAt: new Date().toLocaleString() };
+  function copyLink() {
+    if (!userEmailValidated) {
+      openEmailModal('link');
+      return;
+    }
+    executeLink();
   }
 
-  function copyLink(){
+  function executeLink(){
     navigator.clipboard.writeText(location.href).then(()=>{
       alert('Link copied to clipboard!');
     });
