@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,355 +7,796 @@
   <title>Semcasting | Incremental Media Performance Calculator (Demo)</title>
   <style>
     :root{
-      /* ✅ Light theme (white background, black text) */
-      --bg:#ffffff;
+      --bg:#f8f9fb;
       --card:#ffffff;
-      --card2:#ffffff;
       --border:#d6dbe6;
       --border2:#c7cfde;
       --text:#111111;
       --muted:rgba(17,17,17,.78);
       --muted2:rgba(17,17,17,.60);
       --accent:#2f5bff;
+      --accent-light:rgba(47,91,255,.10);
+      --success:#10b981;
+      --info-bg:#f0f4ff;
+      --info-border:#d0ddff;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
+    
+    * { box-sizing: border-box; }
     body{ margin:0; background:var(--bg); color:var(--text); }
-    .wrap{ max-width: 980px; margin: 0 auto; padding: 24px 18px 56px; }
-
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; padding: 10px 12px; border: 1px solid var(--border);
-      background: #fff; border-radius: 14px;
+    
+    /* Header */
+    .header{
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .header-inner{
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
     .brand{ display:flex; align-items:center; gap:10px; }
     .logo{
       width:34px; height:34px; border-radius:10px;
       background: linear-gradient(135deg, var(--accent), #7aa2ff);
-      box-shadow: 0 10px 24px rgba(47,91,255,.18);
+      box-shadow: 0 4px 12px rgba(47,91,255,.18);
     }
-    .brand h1{ font-size: 15px; margin:0; letter-spacing:.2px; }
+    .brand h1{ font-size: 16px; margin:0; letter-spacing:.2px; }
     .brand .sub{ font-size: 12px; color: var(--muted2); margin: 2px 0 0; }
 
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+    .header-actions{ display:flex; gap:10px; }
     button, select{
       border:1px solid var(--border2); background:#fff; color:var(--text);
-      border-radius: 12px; padding: 10px 12px; cursor:pointer; font-size: 13px;
+      border-radius: 10px; padding: 9px 14px; cursor:pointer; font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
     }
-    select{ cursor:pointer; }
-    button:hover, select:hover{ border-color: var(--accent); }
-    .primary{
-      border-color: rgba(47,91,255,.55);
-      background: rgba(47,91,255,.10);
+    button:hover, select:hover{ 
+      border-color: var(--accent); 
+      background: rgba(47,91,255,.04);
     }
-    .primary:hover{ border-color: var(--accent); background: rgba(47,91,255,.14); }
-
-    /* Mobile/topbar niceties */
-    @media (max-width: 720px){
-      .actions{ justify-content:flex-start; }
-      .actions button, .actions select{ width:100%; }
+    .btn-primary{
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
-
-    .card{ background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 14px; }
-    .titlePrompt{
-      font-weight: 800;
-      font-size: 22px;
-      line-height: 1.2;
-      margin: 0 0 14px 0;
+    .btn-primary:hover{
+      background: #2750e0;
+      border-color: #2750e0;
     }
 
-    /* Inputs: one column */
-    .row{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
+    /* Progress stepper */
+    .progress-container{
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+    }
+    .progress-inner{
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .stepper{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       margin-bottom: 12px;
     }
-
-    .field{ background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 10px; }
-    label{ display:block; font-size: 14px; color: var(--muted); margin-bottom: 6px; font-weight: 650; }
-
-    .hint{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height:1.25; font-weight: 600; }
-    .divider{ height:1px; background: rgba(0,0,0,.10); margin: 12px 0; }
-
-    .input-wrap{ position: relative; }
-    .input-wrap .prefix, .input-wrap .suffix{
-      position:absolute; top:50%; transform:translateY(-50%);
-      opacity:.80; pointer-events:none; font-size: 14px; font-weight: 800; color:var(--text);
+    .step{
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .input-wrap .prefix{ left:10px; }
-    .input-wrap .suffix{ right:10px; }
-
-    input{
-      width:100%; box-sizing:border-box;
-      padding: 10px 10px; border-radius: 10px;
-      border: 1px solid var(--border2);
-      background: #fff; color: var(--text);
-      font-size: 14px; outline: none;
+    .step-circle{
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.3s ease;
     }
-    input:focus{ border-color: var(--accent); }
-
-    /* ✅ tighter spacing between $ and number */
-    .pad-left{ padding-left: 20px !important; }
-    .pad-right{ padding-right: 26px !important; }
-
-    /* Percent fields: 5 characters wide visually + capped by maxlength=5 */
-    .input-wrap.percent-wrap{ display:inline-block; }
-    .input-wrap.percent-wrap input.percent{
-      width: 5ch !important;
-      min-width: 5ch !important;
-      max-width: 5ch !important;
-      text-align:right;
-      box-sizing: content-box;
+    .step.active .step-circle{
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(47,91,255,.15);
+    }
+    .step.completed .step-circle{
+      background: var(--success);
+      color: #fff;
+    }
+    .step-label{
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted2);
+      display: none;
+    }
+    .step.active .step-label{
+      color: var(--accent);
+      display: block;
+    }
+    .step-connector{
+      width: 40px;
+      height: 2px;
+      background: #e5e7eb;
+      transition: all 0.3s ease;
+    }
+    .step.completed + .step-connector{
+      background: var(--success);
+    }
+    
+    .progress-bar-wrap{
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar{
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #7aa2ff);
+      border-radius: 999px;
+      transition: width 0.4s ease;
     }
 
-    /* ✅ CPM field: cap visually (still readable) */
-    input.cpm4{
-      max-width: 8ch;
-      text-align:right;
+    /* Main layout */
+    .container{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    
+    .wizard-layout{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
     }
 
-    .ctaRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 6px; }
-    .ctaBig{
-      font-size: 16px;
-      font-weight: 900;
-      padding: 14px 18px;
-      border-radius: 14px;
-      min-width: 260px;
-    }
-
-    .outputsTitle{ font-size: 16px; font-weight: 850; margin: 0 0 10px; color: var(--muted); }
-
-    /* Outputs: keep 2 columns on desktop */
-    .kpiGrid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
-    @media (min-width: 720px){ .kpiGrid{ grid-template-columns: 1fr 1fr; } }
-
-    .kpi{
+    /* Left panel - inputs */
+    .input-panel{
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
     }
-    .kpi .k{ font-size: 12px; color: var(--muted); font-weight: 800; }
-    .kpi .v{ font-size: 20px; margin-top: 6px; font-weight: 900; }
-    .kpi .m{ font-size: 12px; color: var(--muted2); margin-top: 6px; line-height: 1.25; }
+    .panel-title{
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+    .panel-subtitle{
+      font-size: 14px;
+      color: var(--muted2);
+      margin: 0 0 28px;
+      line-height: 1.5;
+    }
 
-    .err{ color:#b00020; font-size: 12px; margin-top: 10px; display:none; font-weight: 700; }
-    .foot{ margin-top: 14px; font-size: 11px; color: var(--muted2); line-height: 1.35; }
+    .field-group{
+      margin-bottom: 24px;
+    }
+    .field-group:last-child{
+      margin-bottom: 0;
+    }
+    
+    label{
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    
+    .input-wrap{
+      position: relative;
+    }
+    .input-wrap .prefix, .input-wrap .suffix{
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-wrap .prefix{ left: 14px; }
+    .input-wrap .suffix{ right: 14px; }
+    
+    input, select{
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #fff;
+      color: var(--text);
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    input:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47,91,255,.1);
+    }
+    .pad-left{ padding-left: 32px !important; }
+    .pad-right{ padding-right: 32px !important; }
+    
+    .hint{
+      font-size: 12px;
+      color: var(--muted2);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    /* Right panel - info/text */
+    .info-panel{
+      position: sticky;
+      top: 100px;
+      background: var(--info-bg);
+      border: 2px solid var(--info-border);
+      border-radius: 16px;
+      padding: 32px;
+      min-height: 300px;
+    }
+    .info-title{
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 16px;
+      color: var(--accent);
+    }
+    .info-content{
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .info-content p{
+      margin: 0 0 14px;
+    }
+    .info-content p:last-child{
+      margin-bottom: 0;
+    }
+    .info-content ul{
+      margin: 12px 0;
+      padding-left: 20px;
+    }
+    .info-content li{
+      margin-bottom: 8px;
+    }
+    .info-highlight{
+      background: rgba(47,91,255,.08);
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Navigation buttons */
+    .nav-buttons{
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-nav{
+      flex: 1;
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 2px solid var(--border2);
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-nav:hover{
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    .btn-nav.primary{
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-nav.primary:hover{
+      background: #2750e0;
+      border-color: #2750e0;
+    }
+    .btn-nav:disabled{
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Results page */
+    .results-grid{
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .result-card{
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+    .result-card:hover{
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    }
+    .result-label{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .result-value{
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .result-desc{
+      font-size: 12px;
+      color: var(--muted2);
+      line-height: 1.4;
+    }
+
+    /* Page transitions */
+    .page{
+      display: none;
+    }
+    .page.active{
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn{
+      from{ opacity: 0; transform: translateY(10px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+
+    .err{
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c00;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 16px;
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px){
+      .wizard-layout{
+        grid-template-columns: 1fr;
+      }
+      .info-panel{
+        position: static;
+        order: -1;
+      }
+      .stepper{
+        flex-wrap: wrap;
+      }
+      .step-label{
+        display: none !important;
+      }
+      .results-grid{
+        grid-template-columns: 1fr;
+      }
+    }
 
     @media print{
-      body{ background:#fff; color:#111; }
-      .topbar, .ctaRow, .noPrint{ display:none !important; }
-      .card{ background:#fff; border:0; padding:0; margin:0; }
-      .field{ border:1px solid #ddd; background:#fff; }
-      input, select{ background:#fff; color:#111; border:1px solid #ddd; }
-      .kpi{ background:#fff; border:1px solid #ddd; }
-      .wrap{ max-width:none; padding:0; }
+      .header, .progress-container, .nav-buttons, .info-panel{ display:none !important; }
+      body{ background:#fff; }
+      .input-panel{ border:0; box-shadow:none; }
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>Semcasting</h1>
-          <div class="sub">Incremental Media Performance Calculator (Demo)</div>
+          <div class="sub">Incremental Media Performance Calculator</div>
         </div>
       </div>
-
-      <div class="actions noPrint">
-        <select id="benchmarkSelect" title="Benchmark set">
-          <option value="standard">Benchmark: Standard</option>
-          <option value="conservative">Benchmark: Conservative</option>
-          <option value="aggressive">Benchmark: Aggressive</option>
+      <div class="header-actions">
+        <select id="benchmarkSelect" title="Benchmark preset">
+          <option value="standard">Standard Benchmark</option>
+          <option value="conservative">Conservative Benchmark</option>
+          <option value="aggressive">Aggressive Benchmark</option>
         </select>
-        <button id="copyBtn" type="button">Copy shareable link</button>
-        <button id="pdfBtn" class="primary" type="button">Download PDF report</button>
-        <button id="resetBtn" type="button">Reset to benchmark</button>
+        <button id="resetBtn" type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-container">
+    <div class="progress-inner">
+      <div class="stepper">
+        <div class="step" data-step="1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Budget</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" data-step="2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Performance</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" data-step="3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Conversion</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" data-step="4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Value</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" data-step="5">
+          <div class="step-circle">5</div>
+          <div class="step-label">Results</div>
+        </div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar" style="width: 20%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="container">
+    <!-- Page 1: Budget & CPM -->
+    <div class="page active" id="page1">
+      <div class="wizard-layout">
+        <div class="input-panel">
+          <h2 class="panel-title">Budget & Media Cost</h2>
+          <p class="panel-subtitle">Start by entering your digital marketing budget and estimated cost per thousand impressions.</p>
+
+          <div class="field-group">
+            <label for="budget">Display & CTV Digital Marketing Budget</label>
+            <div class="input-wrap">
+              <span class="prefix">$</span>
+              <input id="budget" class="money pad-left" inputmode="numeric" value="10,000,000" required>
+            </div>
+            <div class="hint">Your total annual budget for display and CTV campaigns</div>
+          </div>
+
+          <div class="field-group">
+            <label for="cpm">Blended CPM (Cost Per Thousand)</label>
+            <div class="input-wrap">
+              <span class="prefix">$</span>
+              <input id="cpm" class="money pad-left" inputmode="decimal" value="15.00" required>
+            </div>
+            <div class="hint">Average cost to reach 1,000 impressions across all channels</div>
+          </div>
+
+          <div class="nav-buttons">
+            <button class="btn-nav" disabled>Previous</button>
+            <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
+          </div>
+        </div>
+
+        <div class="info-panel">
+          <h3 class="info-title">Understanding Your Media Investment</h3>
+          <div class="info-content">
+            <p>Your <strong>digital marketing budget</strong> is the foundation of your campaign reach. This includes all spending on display advertising and Connected TV (CTV) campaigns.</p>
+            
+            <p>The <strong>CPM (Cost Per Mille)</strong> represents how efficiently you're buying media. Lower CPMs mean more impressions for your budget, while higher CPMs often indicate premium placements or targeted audiences.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Tip:</strong> A blended CPM of $15-25 is typical for financial services. Premium placements and highly targeted audiences may cost $30-50 CPM.
+            </div>
+            
+            <p><strong>Why this matters:</strong></p>
+            <ul>
+              <li>Budget and CPM determine your total impression volume</li>
+              <li>More impressions = more opportunities to reach prospects</li>
+              <li>Efficient CPMs maximize your campaign reach</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- INPUTS -->
-    <div class="card" id="inputsCard">
-      <p class="titlePrompt">
-        See How Measurement Can Create Incremental Mortgage Applications <br>
-        Enter Your Current Metrics
-      </p>
+    <!-- Page 2: Performance Metrics -->
+    <div class="page" id="page2">
+      <div class="wizard-layout">
+        <div class="input-panel">
+          <h2 class="panel-title">Campaign Performance</h2>
+          <p class="panel-subtitle">Enter your expected click-through and view-through rates, plus current site traffic.</p>
 
-      <div class="row">
-        <div class="field">
-          <label for="budget">Estimated Display and CTV Digital Marketing Budget</label>
-          <div class="input-wrap">
-            <span class="prefix">$</span>
-            <!-- ✅ budget: no decimals -->
-            <input id="budget" class="money pad-left" inputmode="numeric" value="10,000,000" required>
+          <div class="field-group">
+            <label for="ctr">Click-Through / View-Through Rate</label>
+            <div class="input-wrap">
+              <input id="ctr" class="pad-right" inputmode="decimal" value="0.15" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Percentage of impressions that result in clicks or engaged views</div>
           </div>
-          <div class="hint">benchmark: varies by preset</div>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="cpm">Estimated Blended CPM</label>
-          <div class="input-wrap">
-            <span class="prefix">$</span>
-            <!-- ✅ CPM: maxlength=4 + class for styling -->
-            <input id="cpm" class="money cpm4 pad-left" inputmode="decimal" maxlength="4" value="15.0" required>
+          <div class="field-group">
+            <label for="siteVisitors">Current Site Visitors (Annual)</label>
+            <input id="siteVisitors" inputmode="numeric" value="1,200,000" required>
+            <div class="hint">Total number of unique visitors to your site per year</div>
           </div>
-          <div class="hint">benchmark: varies by preset</div>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="ctr">Estimated Click-Through / View-Through Rate</label>
-          <div class="input-wrap percent-wrap">
-            <input id="ctr" class="percent pad-right" inputmode="decimal" maxlength="5" value="0.15" required>
-            <span class="suffix">%</span>
+          <div class="nav-buttons">
+            <button class="btn-nav" onclick="prevPage()">Previous</button>
+            <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
-          <div class="hint">benchmark: varies by preset</div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="startRate">Estimated Application Start Rate</label>
-          <div class="input-wrap percent-wrap">
-            <input id="startRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="0.40" required>
-            <span class="suffix">%</span>
+        <div class="info-panel">
+          <h3 class="info-title">Measuring Campaign Engagement</h3>
+          <div class="info-content">
+            <p>The <strong>CTR/VTR</strong> shows how compelling your creative is and how well you're targeting the right audience. This metric bridges the gap between impressions and actual site traffic.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Benchmark:</strong> Financial services typically see 0.10-0.25% CTR for display ads. CTV campaigns often have lower direct CTR but higher brand lift.
+            </div>
+            
+            <p><strong>Current site visitors</strong> provides context for your existing funnel performance. Understanding your baseline helps measure the true incremental impact of new campaigns.</p>
+            
+            <p><strong>What to expect:</strong></p>
+            <ul>
+              <li>Display ads: 0.10-0.20% CTR average</li>
+              <li>CTV campaigns: Focus on view-through attribution</li>
+              <li>Financial products: Lower CTR but higher intent</li>
+            </ul>
           </div>
-          <div class="hint">benchmark: varies by preset</div>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="completionRate">Estimated Application Completion Rate</label>
-          <div class="input-wrap percent-wrap">
-            <input id="completionRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="40" required>
-            <span class="suffix">%</span>
+    <!-- Page 3: Conversion Funnel -->
+    <div class="page" id="page3">
+      <div class="wizard-layout">
+        <div class="input-panel">
+          <h2 class="panel-title">Conversion Funnel</h2>
+          <p class="panel-subtitle">Define your application funnel from start to completion to funding.</p>
+
+          <div class="field-group">
+            <label for="startRate">Application Start Rate</label>
+            <div class="input-wrap">
+              <input id="startRate" class="pad-right" inputmode="decimal" value="0.40" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Percentage of visitors who begin the application process</div>
           </div>
-          <div class="hint">benchmark: varies by preset</div>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="fundedRate">Estimated Application Funded Rate</label>
-          <div class="input-wrap percent-wrap">
-            <input id="fundedRate" class="percent pad-right" inputmode="decimal" maxlength="5" value="50" required>
-            <span class="suffix">%</span>
+          <div class="field-group">
+            <label for="completionRate">Application Completion Rate</label>
+            <div class="input-wrap">
+              <input id="completionRate" class="pad-right" inputmode="decimal" value="40.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Percentage of started applications that are completed</div>
           </div>
-          <div class="hint">benchmark: varies by preset</div>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="siteVisitors">Estimated Current Site Visitors (per year)</label>
-          <input id="siteVisitors" inputmode="numeric" value="1,200,000" required>
-          <div class="hint">benchmark: varies by preset</div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label for="ltv">Lifetime Value of a Funded Loan</label>
-          <div class="input-wrap">
-            <span class="prefix">$</span>
-            <input id="ltv" class="money pad-left" inputmode="decimal" value="9,000.00" required>
+          <div class="field-group">
+            <label for="fundedRate">Application Funded Rate</label>
+            <div class="input-wrap">
+              <input id="fundedRate" class="pad-right" inputmode="decimal" value="50.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Percentage of completed applications that get funded</div>
           </div>
-          <div class="hint">benchmark: $9,000</div>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="liftPct">Estimated Incremental Lift from Measurement</label>
-          <div class="input-wrap percent-wrap">
-            <input id="liftPct" class="percent pad-right" inputmode="decimal" maxlength="5" value="10" required>
-            <span class="suffix">%</span>
+          <div class="nav-buttons">
+            <button class="btn-nav" onclick="prevPage()">Previous</button>
+            <button class="btn-nav primary" onclick="nextPage()">Next Step</button>
           </div>
-          <div class="hint">benchmark: 10% (applies to total funded volume)</div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="notes">Notes (optional; included in PDF)</label>
-          <input id="notes" type="text" placeholder="Prospect name, campaign, assumptions…">
-          <div class="hint">benchmark: (optional)</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="row">
-        <div class="field">
-          <div class="ctaRow noPrint">
-            <button id="calcBtn" class="primary ctaBig" type="button">Calculate</button>
+        <div class="info-panel">
+          <h3 class="info-title">Optimizing Your Funnel</h3>
+          <div class="info-content">
+            <p>Your conversion funnel shows where prospects drop off between awareness and closing. Each stage represents a critical decision point.</p>
+            
+            <p><strong>Application Start Rate:</strong> The bridge between browsing and serious intent. Higher rates indicate strong value proposition and clear calls-to-action.</p>
+            
+            <p><strong>Completion Rate:</strong> Measures friction in your application process. Abandonment often happens due to complexity or time requirements.</p>
+            
+            <p><strong>Funded Rate:</strong> Reflects credit quality of applicants and your underwriting criteria. This is where qualification meets approval.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Industry averages:</strong><br>
+              Start Rate: 0.3-0.6%<br>
+              Completion: 35-45%<br>
+              Funded: 45-60%
+            </div>
+            
+            <p><strong>Optimization opportunities:</strong></p>
+            <ul>
+              <li>Simplify application flow to boost completion</li>
+              <li>Better pre-qualification to improve funded rate</li>
+              <li>A/B test CTAs to increase start rate</li>
+            </ul>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 4: Value & Lift -->
+    <div class="page" id="page4">
+      <div class="wizard-layout">
+        <div class="input-panel">
+          <h2 class="panel-title">Value & Measurement Impact</h2>
+          <p class="panel-subtitle">Enter the lifetime value of each customer and expected measurement lift.</p>
+
+          <div class="field-group">
+            <label for="ltv">Lifetime Value Per Funded Loan</label>
+            <div class="input-wrap">
+              <span class="prefix">$</span>
+              <input id="ltv" class="money pad-left" inputmode="decimal" value="9,000.00" required>
+            </div>
+            <div class="hint">Total revenue generated from each successfully funded mortgage</div>
+          </div>
+
+          <div class="field-group">
+            <label for="liftPct">Incremental Lift from Measurement</label>
+            <div class="input-wrap">
+              <input id="liftPct" class="pad-right" inputmode="decimal" value="10.00" required>
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Expected improvement in conversions through better measurement</div>
+          </div>
+
+          <div class="field-group">
+            <label for="notes">Notes (Optional)</label>
+            <input id="notes" type="text" placeholder="Campaign name, assumptions, or other context...">
+            <div class="hint">Add any relevant context for your calculation</div>
+          </div>
+
           <div id="err" class="err"></div>
-          <div class="foot">
-            For demo/testing purposes. Calculations are driven entirely by the inputs shown.
+
+          <div class="nav-buttons">
+            <button class="btn-nav" onclick="prevPage()">Previous</button>
+            <button class="btn-nav primary" onclick="calculate()">Calculate Results</button>
+          </div>
+        </div>
+
+        <div class="info-panel">
+          <h3 class="info-title">Quantifying Success</h3>
+          <div class="info-content">
+            <p><strong>Lifetime Value (LTV)</strong> represents the total profit you earn from each funded loan over its lifetime. This includes origination fees, servicing revenue, and any other monetization.</p>
+            
+            <div class="info-highlight">
+              💡 <strong>Typical LTV for mortgages:</strong> $8,000-12,000 depending on loan size, rate, and whether you service or sell the loan.
+            </div>
+            
+            <p><strong>Measurement Lift</strong> quantifies how better attribution and insights improve campaign performance. When you can accurately measure what works, you optimize faster and waste less budget.</p>
+            
+            <p><strong>How measurement creates lift:</strong></p>
+            <ul>
+              <li><strong>Better targeting:</strong> Identify and reach high-intent audiences</li>
+              <li><strong>Creative optimization:</strong> Double down on messaging that converts</li>
+              <li><strong>Channel allocation:</strong> Shift spend to highest-performing channels</li>
+              <li><strong>Reduced waste:</strong> Eliminate underperforming campaigns faster</li>
+            </ul>
+            
+            <p>Industry studies show measurement-driven optimization typically delivers 7-15% lift in campaign performance over baseline approaches.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- OUTPUTS -->
-    <div class="card" id="outputsCard">
-      <p class="outputsTitle">Outputs</p>
+    <!-- Page 5: Results -->
+    <div class="page" id="page5">
+      <div class="wizard-layout">
+        <div class="input-panel">
+          <h2 class="panel-title">Your Results</h2>
+          <p class="panel-subtitle">Here's the projected impact of your campaign with measurement-driven optimization.</p>
 
-      <div class="kpiGrid">
-        <div class="kpi">
-          <div class="k">All Impressions Delivered (Banner/CTV)</div>
-          <div class="v" id="o_impr">—</div>
-          <div class="m" id="o_impr_mini">—</div>
+          <div class="results-grid">
+            <div class="result-card">
+              <div class="result-label">Total Impressions</div>
+              <div class="result-value" id="o_impr">—</div>
+              <div class="result-desc" id="o_impr_mini">—</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Application Starts</div>
+              <div class="result-value" id="o_starts">—</div>
+              <div class="result-desc" id="o_starts_mini">—</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Applications Completed</div>
+              <div class="result-value" id="o_comp">—</div>
+              <div class="result-desc" id="o_comp_mini">—</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Loans Funded</div>
+              <div class="result-value" id="o_funded">—</div>
+              <div class="result-desc" id="o_funded_mini">—</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Base Revenue</div>
+              <div class="result-value" id="o_rev_base">—</div>
+              <div class="result-desc" id="o_rev_base_mini">Without measurement optimization</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">Revenue with Measurement</div>
+              <div class="result-value" id="o_rev_meas">—</div>
+              <div class="result-desc" id="o_rev_meas_mini">With measurement optimization</div>
+            </div>
+
+            <div class="result-card" style="border-color: var(--success); border-width: 3px;">
+              <div class="result-label" style="color: var(--success)">⬆ Incremental Loans</div>
+              <div class="result-value" style="color: var(--success)" id="o_inc_funded">—</div>
+              <div class="result-desc" id="o_inc_funded_mini">Additional funded applications</div>
+            </div>
+
+            <div class="result-card" style="border-color: var(--success); border-width: 3px;">
+              <div class="result-label" style="color: var(--success)">⬆ Incremental Revenue</div>
+              <div class="result-value" style="color: var(--success)" id="o_inc_rev">—</div>
+              <div class="result-desc" id="o_inc_rev_mini">Additional revenue from measurement</div>
+            </div>
+          </div>
+
+          <div class="nav-buttons">
+            <button class="btn-nav" onclick="prevPage()">Previous</button>
+            <button class="btn-nav primary" onclick="downloadPDF()">Download PDF Report</button>
+            <button class="btn-nav" onclick="copyLink()">Copy Shareable Link</button>
+          </div>
         </div>
 
-        <div class="kpi">
-          <div class="k">Total Application Starts</div>
-          <div class="v" id="o_starts">—</div>
-          <div class="m" id="o_starts_mini">—</div>
-        </div>
-
-        <div class="kpi">
-          <div class="k">Total Application Completions</div>
-          <div class="v" id="o_comp">—</div>
-          <div class="m" id="o_comp_mini">—</div>
-        </div>
-
-        <div class="kpi">
-          <div class="k">Total Application Funded</div>
-          <div class="v" id="o_funded">—</div>
-          <div class="m" id="o_funded_mini">—</div>
-        </div>
-
-        <div class="kpi">
-          <div class="k">Total Direct Revenue from Digital Advertising (Base)</div>
-          <div class="v" id="o_rev_base">—</div>
-          <div class="m" id="o_rev_base_mini">—</div>
-        </div>
-
-        <div class="kpi">
-          <div class="k">Total Direct Revenue from Digital Advertising (With Measurement)</div>
-          <div class="v" id="o_rev_meas">—</div>
-          <div class="m" id="o_rev_meas_mini">—</div>
-        </div>
-
-        <div class="kpi">
-          <div class="k">Incremental Funded Applications from Measurement</div>
-          <div class="v" id="o_inc_funded">—</div>
-          <div class="m" id="o_inc_funded_mini">—</div>
-        </div>
-
-        <div class="kpi">
-          <div class="k">Incremental Direct Revenue from Measurement</div>
-          <div class="v" id="o_inc_rev">—</div>
-          <div class="m" id="o_inc_rev_mini">—</div>
+        <div class="info-panel">
+          <h3 class="info-title">Understanding Your Impact</h3>
+          <div class="info-content">
+            <p>These results show the projected performance of your digital marketing investment with and without measurement-driven optimization.</p>
+            
+            <div class="info-highlight">
+              🎯 <strong>Key Insight:</strong> The incremental revenue represents the additional business value created by implementing proper measurement and attribution.
+            </div>
+            
+            <p><strong>What drives the lift:</strong></p>
+            <ul>
+              <li><strong>Smarter targeting:</strong> Measurement reveals which audiences convert best</li>
+              <li><strong>Creative optimization:</strong> Real-time insights show what messaging works</li>
+              <li><strong>Budget efficiency:</strong> Allocate spend to highest-performing channels</li>
+              <li><strong>Faster learning:</strong> Shorten the cycle from test to optimization</li>
+            </ul>
+            
+            <p><strong>Next steps:</strong></p>
+            <ul>
+              <li>Download the PDF report to share with stakeholders</li>
+              <li>Adjust inputs to model different scenarios</li>
+              <li>Contact Semcasting to discuss implementation</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -362,6 +804,9 @@
 
 <script>
   const $ = (id) => document.getElementById(id);
+
+  let currentPage = 1;
+  const totalPages = 5;
 
   const els = {
     benchmarkSelect: $("benchmarkSelect"),
@@ -375,12 +820,7 @@
     ltv: $("ltv"),
     liftPct: $("liftPct"),
     notes: $("notes"),
-
     err: $("err"),
-    calcBtn: $("calcBtn"),
-    resetBtn: $("resetBtn"),
-    copyBtn: $("copyBtn"),
-    pdfBtn: $("pdfBtn"),
 
     o_impr: $("o_impr"),
     o_impr_mini: $("o_impr_mini"),
@@ -390,7 +830,6 @@
     o_comp_mini: $("o_comp_mini"),
     o_funded: $("o_funded"),
     o_funded_mini: $("o_funded_mini"),
-
     o_rev_base: $("o_rev_base"),
     o_rev_base_mini: $("o_rev_base_mini"),
     o_rev_meas: $("o_rev_meas"),
@@ -438,6 +877,42 @@
     }
   };
 
+  // Navigation
+  function nextPage(){
+    if (currentPage < totalPages){
+      currentPage++;
+      showPage(currentPage);
+    }
+  }
+
+  function prevPage(){
+    if (currentPage > 1){
+      currentPage--;
+      showPage(currentPage);
+    }
+  }
+
+  function showPage(pageNum){
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    // Show current page
+    $('page' + pageNum).classList.add('active');
+    
+    // Update stepper
+    document.querySelectorAll('.step').forEach((step, idx) => {
+      step.classList.remove('active', 'completed');
+      if (idx + 1 < pageNum) step.classList.add('completed');
+      if (idx + 1 === pageNum) step.classList.add('active');
+    });
+    
+    // Update progress bar
+    const progress = (pageNum / totalPages) * 100;
+    $('progressBar').style.width = progress + '%';
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   // Helpers
   function stripNonNumeric(s){ return (s || "").toString().replace(/[^0-9.]/g, ""); }
   function parseNumberFromInput(el){
@@ -446,26 +921,28 @@
     return isFinite(n) ? n : NaN;
   }
 
-  // Currency formatting with selectable decimals
   function setFormattedCurrency(el, value, decimals){
     if (!isFinite(value)) { el.value = ""; return; }
     const d = (typeof decimals === "number") ? decimals : 2;
     el.value = value.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
   }
+  
   function setFormattedInteger(el, value){
     if (!isFinite(value)) { el.value = ""; return; }
     el.value = Math.round(value).toLocaleString(undefined, { maximumFractionDigits: 0 });
   }
+  
   function setFormattedPercent(el, value){
     if (!isFinite(value)) { el.value = ""; return; }
     const v = Math.round(value * 100) / 100;
-    el.value = String(v).slice(0,5);
+    el.value = String(v);
   }
 
   function fmtMoney0(x){
     if (!isFinite(x)) return "—";
     return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
   }
+  
   function fmtInt(x){
     if (!isFinite(x)) return "—";
     return x.toLocaleString(undefined,{maximumFractionDigits:0});
@@ -474,49 +951,6 @@
   function showErr(msg){
     els.err.style.display = msg ? "block" : "none";
     els.err.textContent = msg || "";
-  }
-
-  // Percent rules
-  function attachPercentRules(id){
-    const el = $(id);
-    el.addEventListener("input", () => {
-      let v = el.value.replace(/[^0-9.]/g,'');
-      const parts = v.split('.');
-      if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
-      if (v.includes('.')) {
-        const [a,b] = v.split('.');
-        v = a + '.' + (b ?? '').slice(0,2);
-      }
-      if (v.length > 5) v = v.slice(0,5);
-      el.value = v;
-    });
-    el.addEventListener("blur", () => {
-      const n = parseFloat(el.value || "0");
-      const clamped = Math.min(Math.max(isFinite(n) ? n : 0, 0), 100);
-      el.value = String(Math.round(clamped * 100) / 100).slice(0,5);
-    });
-  }
-
-  // ✅ CPM rule: max 4 characters
-  function attachCpmRules(id){
-    const el = $(id);
-    el.addEventListener("input", () => {
-      let v = el.value.replace(/[^0-9.]/g,'');
-      const parts = v.split('.');
-      if (parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
-      if (v.includes('.')) {
-        const [a,b] = v.split('.');
-        v = a + '.' + (b ?? '').slice(0,2);
-      }
-      if (v.length > 4) v = v.slice(0,4);
-      el.value = v;
-    });
-    el.addEventListener("blur", () => {
-      const n = parseFloat(el.value || "");
-      if (!isFinite(n)) { el.value = ""; return; }
-      // Keep it compact; do NOT add extra zeros, but keep within 4 chars
-      el.value = String(n).slice(0,4);
-    });
   }
 
   function wireCurrency(id, defaultValue, decimals){
@@ -544,6 +978,15 @@
     });
   }
 
+  function wirePercent(id){
+    const el = $(id);
+    el.addEventListener("blur", () => {
+      const n = parseFloat(el.value || "0");
+      const clamped = Math.min(Math.max(isFinite(n) ? n : 0, 0), 100);
+      el.value = String(Math.round(clamped * 100) / 100);
+    });
+  }
+
   function pctToDec(percentNumber, name){
     if (!isFinite(percentNumber)) throw new Error(`${name} must be a number.`);
     if (percentNumber < 0 || percentNumber > 100) throw new Error(`${name} must be between 0 and 100.`);
@@ -557,23 +1000,23 @@
     const cpm = parseNumberFromInput(els.cpm);
     if (!isFinite(cpm) || cpm < 2) throw new Error("CPM must be a number ≥ 2.");
 
-    const ctr = pctToDec(parseNumberFromInput(els.ctr), "Estimated Click-Through / View-Through Rate (%)");
-    const startRate = pctToDec(parseNumberFromInput(els.startRate), "Estimated Application Start Rate (%)");
-    const completionRate = pctToDec(parseNumberFromInput(els.completionRate), "Estimated Application Completion Rate (%)");
-    const fundedRate = pctToDec(parseNumberFromInput(els.fundedRate), "Estimated Application Funded Rate (%)");
+    const ctr = pctToDec(parseNumberFromInput(els.ctr), "Click-Through Rate (%)");
+    const startRate = pctToDec(parseNumberFromInput(els.startRate), "Application Start Rate (%)");
+    const completionRate = pctToDec(parseNumberFromInput(els.completionRate), "Application Completion Rate (%)");
+    const fundedRate = pctToDec(parseNumberFromInput(els.fundedRate), "Application Funded Rate (%)");
 
     const siteVisitors = parseNumberFromInput(els.siteVisitors);
     if (!isFinite(siteVisitors) || siteVisitors < 0) throw new Error("Site Visitors must be a number ≥ 0.");
 
     const ltv = parseNumberFromInput(els.ltv);
-    if (!isFinite(ltv) || ltv < 0) throw new Error("Lifetime Value of a Funded Loan must be ≥ 0.");
+    if (!isFinite(ltv) || ltv < 0) throw new Error("Lifetime Value must be ≥ 0.");
 
-    const liftPct = pctToDec(parseNumberFromInput(els.liftPct), "Estimated Incremental Lift from Measurement (%)");
+    const liftPct = pctToDec(parseNumberFromInput(els.liftPct), "Incremental Lift (%)");
 
     return { budget, cpm, ctr, startRate, completionRate, fundedRate, siteVisitors, ltv, liftPct };
   }
 
-  function calc(){
+  function calculate(){
     try{
       showErr("");
       const i = readInputs();
@@ -592,254 +1035,39 @@
       const incRevenue = measRevenue - baseRevenue;
 
       els.o_impr.textContent = fmtInt(impressions);
-      els.o_impr_mini.textContent = "Computed as (Budget ÷ CPM) × 1000";
+      els.o_impr_mini.textContent = "From your media budget and CPM";
 
       els.o_starts.textContent = fmtInt(totalStarts);
-      els.o_starts_mini.textContent = "Impressions × CTR/VTR × Application Start Rate";
+      els.o_starts_mini.textContent = "Based on CTR and start rate";
 
       els.o_comp.textContent = fmtInt(totalCompletions);
-      els.o_comp_mini.textContent = "Total Application Starts × Application Completion Rate";
+      els.o_comp_mini.textContent = "Applications that are completed";
 
       els.o_funded.textContent = fmtInt(totalFunded);
-      els.o_funded_mini.textContent = "Total Application Completions × Application Funded Rate";
+      els.o_funded_mini.textContent = "Successfully funded loans";
 
       els.o_rev_base.textContent = fmtMoney0(baseRevenue);
-      els.o_rev_base_mini.textContent = "Total Application Funded × Lifetime Value of a Funded Loan";
+      els.o_rev_base_mini.textContent = "Total revenue without optimization";
 
       els.o_rev_meas.textContent = fmtMoney0(measRevenue);
-      els.o_rev_meas_mini.textContent = `Applies measurement lift of ${(i.liftPct*100).toFixed(2).replace(/\.00$/,'')}% to funded volume`;
+      els.o_rev_meas_mini.textContent = "Total revenue with measurement";
 
       els.o_inc_funded.textContent = fmtInt(incFunded);
-      els.o_inc_funded_mini.textContent = "With Measurement Funded − Base Funded";
+      els.o_inc_funded_mini.textContent = "Additional loans from measurement";
 
       els.o_inc_rev.textContent = fmtMoney0(incRevenue);
-      els.o_inc_rev_mini.textContent = "With Measurement Revenue − Base Revenue";
+      els.o_inc_rev_mini.textContent = "Additional revenue from measurement";
 
-      syncUrl();
-      document.getElementById("outputsCard").scrollIntoView({ behavior: "smooth", block: "start" });
+      nextPage();
     } catch(e){
-      showErr(e.message || "Check your inputs.");
+      showErr(e.message || "Please check your inputs.");
     }
-  }
-
-  function escapeHtml(str){
-    return (str || "").toString()
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  function getSnapshot(){
-    const now = new Date();
-    const iv = (id) => $(id).value;
-
-    const inputs = [
-      ["Estimated Display and CTV Digital Marketing Budget", "$" + escapeHtml(iv("budget"))],
-      ["Estimated Blended CPM", "$" + escapeHtml(iv("cpm"))],
-      ["Estimated Click-Through / View-Through Rate", escapeHtml(iv("ctr")) + "%"],
-      ["Estimated Application Start Rate", escapeHtml(iv("startRate")) + "%"],
-      ["Estimated Application Completion Rate", escapeHtml(iv("completionRate")) + "%"],
-      ["Estimated Application Funded Rate", escapeHtml(iv("fundedRate")) + "%"],
-      ["Estimated Current Site Visitors (per year)", escapeHtml(iv("siteVisitors"))],
-      ["Lifetime Value of a Funded Loan", "$" + escapeHtml(iv("ltv"))],
-      ["Estimated Incremental Lift from Measurement", escapeHtml(iv("liftPct")) + "%"],
-      ["Benchmark preset", escapeHtml(els.benchmarkSelect.value)],
-    ];
-
-    const outputs = [
-      ["All Impressions Delivered (Banner/CTV)", escapeHtml(els.o_impr.textContent)],
-      ["Total Application Starts", escapeHtml(els.o_starts.textContent)],
-      ["Total Application Completions", escapeHtml(els.o_comp.textContent)],
-      ["Total Application Funded", escapeHtml(els.o_funded.textContent)],
-      ["Total Direct Revenue from Digital Advertising (Base)", escapeHtml(els.o_rev_base.textContent)],
-      ["Total Direct Revenue from Digital Advertising (With Measurement)", escapeHtml(els.o_rev_meas.textContent)],
-      ["Incremental Funded Applications from Measurement", escapeHtml(els.o_inc_funded.textContent)],
-      ["Incremental Direct Revenue from Measurement", escapeHtml(els.o_inc_rev.textContent)],
-    ];
-
-    return {
-      generatedAt: now.toLocaleString(),
-      notes: (els.notes.value || "").trim(),
-      shareLink: location.href,
-      inputs,
-      outputs
-    };
-  }
-
-  function openPdfReport(){
-    calc();
-    const snap = getSnapshot();
-
-    const style = `
-      <style>
-        @page { margin: 18mm; }
-        body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#111; }
-        .hdr{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
-        .brand{ display:flex; align-items:center; gap:10px; }
-        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #2f5bff, #7aa2ff); }
-        h1{ font-size: 16px; margin:0; }
-        .meta{ font-size: 11px; color:#444; text-align:right; }
-        .sub{ margin: 10px 0 14px; color:#333; font-size:12px; line-height:1.35; }
-        .box{ border:1px solid #ddd; border-radius: 10px; padding: 12px; margin: 12px 0; }
-        h2{ font-size: 13px; margin: 0 0 10px; }
-        table{ width:100%; border-collapse: collapse; font-size: 12px; }
-        td{ padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
-        td:first-child{ width: 64%; color:#222; }
-        td:last-child{ width: 36%; text-align:right; font-weight:600; }
-        .note{ font-size: 12px; color:#333; white-space: pre-wrap; }
-        .footer{ margin-top: 14px; font-size: 10px; color:#666; line-height:1.35; }
-        .pill{ display:inline-block; padding: 2px 8px; border:1px solid #e5e5e5; border-radius:999px; font-size:11px; color:#444; }
-        @media print{ .noprint{ display:none; } }
-      </style>
-    `;
-
-    const rows = (arr) => arr.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
-
-    const html = `
-      <!doctype html>
-      <html>
-      <head><meta charset="utf-8">${style}<title>Semcasting Report</title></head>
-      <body onload="setTimeout(()=>window.print(),250)">
-        <div class="hdr">
-          <div class="brand">
-            <div class="logo" aria-hidden="true"></div>
-            <div>
-              <h1>Semcasting — Incremental Media Performance (Demo Report)</h1>
-              <div class="sub" style="margin:4px 0 0; font-size:11px; color:#555;">
-                Financial Organization Planning Outputs
-              </div>
-            </div>
-          </div>
-          <div class="meta">
-            <div><span class="pill">Generated</span> ${escapeHtml(snap.generatedAt)}</div>
-          </div>
-        </div>
-
-        <div class="sub">
-          Impressions are computed as <b>(Budget ÷ CPM) × 1000</b>. Measurement impact is modeled as an <b>incremental lift applied to funded volume</b>.
-        </div>
-
-        ${snap.notes ? `
-          <div class="box">
-            <h2>Notes</h2>
-            <div class="note">${escapeHtml(snap.notes)}</div>
-          </div>
-        ` : ""}
-
-        <div class="box">
-          <h2>Inputs</h2>
-          <table>${rows(snap.inputs)}</table>
-        </div>
-
-        <div class="box">
-          <h2>Outputs</h2>
-          <table>${rows(snap.outputs)}</table>
-        </div>
-
-        <div class="footer">
-          Shareable link: ${escapeHtml(snap.shareLink)}<br/>
-          For demo/testing purposes. © ${new Date().getFullYear()} Semcasting.
-        </div>
-
-        <div class="noprint" style="margin-top:14px;">
-          <button onclick="window.print()" style="padding:10px 12px; border:1px solid #bbb; border-radius:10px; background:#fff; cursor:pointer;">
-            Print / Save as PDF
-          </button>
-        </div>
-      </body>
-      </html>
-    `;
-
-    const w = window.open("", "_blank", "noopener,noreferrer");
-    if (!w) return;
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-  }
-
-  function syncUrl(){
-    const num = (id) => {
-      const v = parseNumberFromInput($(id));
-      return isFinite(v) ? String(v) : "";
-    };
-    const params = new URLSearchParams({
-      preset: els.benchmarkSelect.value,
-      b: num("budget"),
-      cpm: num("cpm"),
-      ctr: num("ctr"),
-      sr: num("startRate"),
-      cr: num("completionRate"),
-      fr: num("fundedRate"),
-      sv: num("siteVisitors"),
-      ltv: num("ltv"),
-      lift: num("liftPct"),
-      n: els.notes.value || ""
-    });
-    history.replaceState(null, "", `${location.origin}${location.pathname}?${params.toString()}`);
-  }
-
-  function loadFromUrl(){
-    const p = new URLSearchParams(location.search);
-    if (!p.toString()) return;
-
-    if (p.has("preset") && BENCHMARKS[p.get("preset")]) {
-      els.benchmarkSelect.value = p.get("preset");
-    }
-
-    const setNum = (key, elId, formatFn) => {
-      if (!p.has(key)) return;
-      const n = parseFloat(p.get(key));
-      if (!isFinite(n)) return;
-      formatFn($(elId), n);
-    };
-
-    // ✅ budget: format with 0 decimals
-    if (p.has("b")) {
-      const n = parseFloat(p.get("b"));
-      if (isFinite(n)) setFormattedCurrency(els.budget, n, 0);
-    }
-    // CPM/ltv keep 2 decimals
-    setNum("cpm","cpm", (el, n) => setFormattedCurrency(el, n, 2));
-    setNum("ltv","ltv", (el, n) => setFormattedCurrency(el, n, 2));
-
-    setNum("ctr","ctr", setFormattedPercent);
-    setNum("sr","startRate", setFormattedPercent);
-    setNum("cr","completionRate", setFormattedPercent);
-    setNum("fr","fundedRate", setFormattedPercent);
-    setNum("lift","liftPct", setFormattedPercent);
-
-    setNum("sv","siteVisitors", setFormattedInteger);
-
-    if (p.has("n")) $("notes").value = p.get("n");
-  }
-
-  function copyShareLink(){
-    navigator.clipboard.writeText(location.href).then(()=>{
-      els.copyBtn.textContent = "Link copied";
-      setTimeout(()=> els.copyBtn.textContent = "Copy shareable link", 1200);
-    }).catch(()=>{
-      els.copyBtn.textContent = "Copy failed";
-      setTimeout(()=> els.copyBtn.textContent = "Copy shareable link", 1200);
-    });
-  }
-
-  function clearOutputs(){
-    [
-      "o_impr","o_starts","o_comp","o_funded",
-      "o_rev_base","o_rev_meas","o_inc_funded","o_inc_rev",
-      "o_impr_mini","o_starts_mini","o_comp_mini","o_funded_mini",
-      "o_rev_base_mini","o_rev_meas_mini","o_inc_funded_mini","o_inc_rev_mini"
-    ].forEach(id => { if ($(id)) $(id).textContent = "—"; });
   }
 
   function applyPreset(presetKey){
     const b = BENCHMARKS[presetKey] || BENCHMARKS.standard;
 
-    // ✅ budget: 0 decimals
     setFormattedCurrency(els.budget, b.budget, 0);
-    // CPM/ltv: 2 decimals
     setFormattedCurrency(els.cpm, b.cpm, 2);
     setFormattedPercent(els.ctr, b.ctr);
     setFormattedPercent(els.startRate, b.startRate);
@@ -850,37 +1078,106 @@
     setFormattedPercent(els.liftPct, b.liftPct);
 
     showErr("");
-    clearOutputs();
-    syncUrl();
+    currentPage = 1;
+    showPage(1);
   }
 
-  // Wire formatting behaviors
-  // ✅ budget: no decimals
+  function downloadPDF(){
+    const snap = getSnapshot();
+    const style = `
+      <style>
+        @page { margin: 18mm; }
+        body{ font-family: system-ui, sans-serif; color:#111; }
+        .hdr{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .logo{ width:30px; height:30px; border-radius:8px; background: linear-gradient(135deg, #2f5bff, #7aa2ff); display:inline-block; }
+        h1{ font-size: 18px; margin:0; }
+        .meta{ font-size: 11px; color:#666; }
+        .box{ border:1px solid #ddd; border-radius: 10px; padding: 16px; margin: 16px 0; }
+        h2{ font-size: 14px; margin: 0 0 12px; font-weight:800; }
+        table{ width:100%; border-collapse: collapse; font-size: 13px; }
+        td{ padding: 10px 8px; border-bottom: 1px solid #eee; }
+        td:first-child{ width: 65%; }
+        td:last-child{ text-align:right; font-weight:700; }
+      </style>
+    `;
+
+    const escapeHtml = (str) => (str || "").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+
+    const inputs = [
+      ["Marketing Budget", "$" + escapeHtml(els.budget.value)],
+      ["Blended CPM", "$" + escapeHtml(els.cpm.value)],
+      ["Click-Through Rate", escapeHtml(els.ctr.value) + "%"],
+      ["Application Start Rate", escapeHtml(els.startRate.value) + "%"],
+      ["Completion Rate", escapeHtml(els.completionRate.value) + "%"],
+      ["Funded Rate", escapeHtml(els.fundedRate.value) + "%"],
+      ["Site Visitors", escapeHtml(els.siteVisitors.value)],
+      ["LTV Per Loan", "$" + escapeHtml(els.ltv.value)],
+      ["Measurement Lift", escapeHtml(els.liftPct.value) + "%"],
+    ];
+
+    const outputs = [
+      ["Total Impressions", escapeHtml(els.o_impr.textContent)],
+      ["Application Starts", escapeHtml(els.o_starts.textContent)],
+      ["Completions", escapeHtml(els.o_comp.textContent)],
+      ["Funded Loans", escapeHtml(els.o_funded.textContent)],
+      ["Base Revenue", escapeHtml(els.o_rev_base.textContent)],
+      ["Revenue with Measurement", escapeHtml(els.o_rev_meas.textContent)],
+      ["Incremental Loans", escapeHtml(els.o_inc_funded.textContent)],
+      ["Incremental Revenue", escapeHtml(els.o_inc_rev.textContent)],
+    ];
+
+    const rows = (arr) => arr.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+
+    const html = `
+      <!doctype html>
+      <html>
+      <head><meta charset="utf-8">${style}<title>Semcasting Report</title></head>
+      <body onload="setTimeout(()=>window.print(),250)">
+        <div class="hdr">
+          <div>
+            <div class="logo"></div>
+            <h1>Semcasting — Media Performance Report</h1>
+          </div>
+          <div class="meta">Generated ${new Date().toLocaleString()}</div>
+        </div>
+        ${els.notes.value ? `<div class="box"><h2>Notes</h2><p>${escapeHtml(els.notes.value)}</p></div>` : ""}
+        <div class="box"><h2>Inputs</h2><table>${rows(inputs)}</table></div>
+        <div class="box"><h2>Results</h2><table>${rows(outputs)}</table></div>
+      </body>
+      </html>
+    `;
+
+    const w = window.open("", "_blank");
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+    }
+  }
+
+  function getSnapshot(){
+    return { generatedAt: new Date().toLocaleString() };
+  }
+
+  function copyLink(){
+    navigator.clipboard.writeText(location.href).then(()=>{
+      alert('Link copied to clipboard!');
+    });
+  }
+
+  // Wire inputs
   wireCurrency("budget", BENCHMARKS.standard.budget, 0);
-  // CPM/ltv: 2 decimals
   wireCurrency("cpm", BENCHMARKS.standard.cpm, 2);
   wireCurrency("ltv", BENCHMARKS.standard.ltv, 2);
-
   wireInteger("siteVisitors", BENCHMARKS.standard.siteVisitors);
-
-  ["ctr","startRate","completionRate","fundedRate","liftPct"].forEach(attachPercentRules);
-  attachCpmRules("cpm");
+  ["ctr","startRate","completionRate","fundedRate","liftPct"].forEach(wirePercent);
 
   // Init
-  loadFromUrl();
-  if (!location.search) {
-    els.benchmarkSelect.value = "standard";
-    applyPreset("standard");
-  } else {
-    if (!new URLSearchParams(location.search).has("preset")) syncUrl();
-  }
+  applyPreset("standard");
 
-  // Buttons / controls
-  els.calcBtn.addEventListener("click", calc);
-  els.resetBtn.addEventListener("click", () => applyPreset(els.benchmarkSelect.value));
-  els.copyBtn.addEventListener("click", copyShareLink);
-  els.pdfBtn.addEventListener("click", openPdfReport);
+  // Events
   els.benchmarkSelect.addEventListener("change", () => applyPreset(els.benchmarkSelect.value));
+  $("resetBtn").addEventListener("click", () => applyPreset(els.benchmarkSelect.value));
 </script>
 </body>
 </html>
