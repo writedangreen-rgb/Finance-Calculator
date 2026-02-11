@@ -1289,7 +1289,7 @@
             <div class="result-card" style="grid-column: 1 / -1; border-color: var(--accent); border-width: 3px;">
               <div class="result-label" style="color: var(--accent)">Total Revenue (Current State)</div>
               <div class="result-value" style="color: var(--accent)" id="o_rev_base">—</div>
-              <div class="result-desc" id="o_rev_base_mini">Revenue from current marketing without measurement optimization</div>
+              <div class="result-desc" id="o_rev_base_mini" style="font-weight: 700; color: var(--accent);"><strong>This is revenue attributable to digital media only WITHOUT measurement optimizations. The revenue does not represent all company revenue drivers (e.g., word of mouth, walk-ins, other channels) that also generate loan applications.</strong></div>
             </div>
           </div>
 
@@ -1847,7 +1847,7 @@
       els.o_funded_mini.textContent = "Successfully funded loans (baseline)";
 
       els.o_rev_base.textContent = fmtMoney0(baseRevenue);
-      els.o_rev_base_mini.textContent = "Total revenue without optimization";
+      els.o_rev_base_mini.innerHTML = "<strong>This is revenue attributable to digital media only WITHOUT measurement optimizations. The revenue does not represent all company revenue drivers (e.g., word of mouth, walk-ins, other channels) that also generate loan applications.</strong>";
 
       // ===== NEW CALCULATIONS FOR PAGE 6 =====
       
